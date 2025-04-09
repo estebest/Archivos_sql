@@ -2056,3 +2056,82 @@ FROM EMP;
 
 
 -- EJERCICIO DE FUNCIONES
+
+--Mostrar todos los apellidos de los empleados en Mayúsculas
+
+SELECT UPPER(APELLIDO) AS APELLIDO FROM EMP;
+
+/*
+2. Construir una consulta para que salga la fecha de hoy con el siguiente formato:
+
+FECHA DE HOY
+-----------------------------------------
+Martes 06 de Octubre de 2020
+*/
+
+select sysdate as fecha from dual;
+
+select to_char(sysdate, 'DAY DD "DE" MONTH "DE" YYYY', 'NLS_DATE_LANGUAGE=SPANISH') as fecha from dual;
+
+-- LO MISMO PERO EN ITALIANO
+
+select to_char(sysdate, 'DAY DD "DE" MONTH "DE" YYYY', 'NLS_DATE_LANGUAGE=ITALIAN') as fecha from dual;
+
+--    3. Queremos cambiar el departamento de Barcelona y llevarlo a Tabarnia.
+--Para ello tenemos que saber qué empleados cambiarían de localidad y cuáles no.  
+-- Combinar tablas y mostrar el nombre del departamento junto a los datos del empleado.
+
+
+
+SELECT DEPT.DNOMBRE, EMP.APELLIDO,
+CASE DEPT.LOC
+  WHEN 'BARCELONA' THEN 'A TABARNIA'
+  ELSE 'NO CAMBIA DE LOCALIDAD'
+END AS TRASLADO
+FROM EMP
+INNER JOIN DEPT
+ON EMP.DEPT_NO = DEPT.DEPT_NO;
+
+
+--Mirar la fecha de alta del presidente. Visualizar todos los empleados dados de alta 330 días antes que el presidente. 
+
+SELECT APELLIDO,OFICIO, FECHA_ALT FROM EMP 
+WHERE FECHA_ALT < ((SELECT FECHA_ALT FROM EMP WHERE OFICIO= 'PRESIDENTE')-330);
+
+-- HACER INFORME
+
+
+SELECT APELLIDO, LENGTH(APELLIDO) AS LARGO FROM EMP;
+
+
+select RPAD (APELLIDO,14, '.') AS I_APELLIDO,
+    RPAD (OFICIO,14, '.') AS I_OFICIO , 
+    RPAD (SALARIO,14, '.') AS I_SALARIO,
+    RPAD (NVL(COMISION,0), 14, '.') AS I_COMISION,
+    RPAD (DEPT_NO, 14, '.') AS I_DEPT_NO
+from emp;
+
+SELECT RPAD(*,14, '.') AS INFORME FROM EMP; 
+
+SELECT * FROM EMP;
+
+/*
+    6. Nos piden otro, en el que se muestren todos los empleados de la siguiente manera:
+
+
+fechas de alta
+------------------------------------------------------------------------------
+El Señor Tovar con cargo de Vendedor se dió de alta el jueves  11 de noviembre  de 2095 en la empresa
+*/
+
+select to_char(sysdate, 'DAY DD "DE" MONTH "DE" YYYY', 'NLS_DATE_LANGUAGE=SPANISH') as fecha from dual;
+
+
+SELECT * FROM EMP;
+
+SELECT INITCAP ('EL SEÑOR ' ||APELLIDO ||'CON CARGO DE ' || OFICIO || 'SE DIÓ DE ALTA EL ' || to_char(sysdate, 'DAY DD "DE" MONTH "DE" YYYY "EN LA EMPRESA"', 'NLS_DATE_LANGUAGE=SPANISH')) AS INITC FROM EMP;
+
+
+SELECT CONCAT( 
+  INITCAP ('EL SEÑOR ' ||APELLIDO ||'CON CARGO DE ' || OFICIO || 'SE DIÓ DE ALTA EL ') ,
+  to_char(sysdate, 'DAY DD "DE" MONTH "DE" YYYY "EN LA EMPRESA"', 'NLS_DATE_LANGUAGE=SPANISH') ) AS RESULTADO FROM EMP;

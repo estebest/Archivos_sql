@@ -507,23 +507,36 @@ SELECT MAX(2,3,5) FROM DUAL;
 ----- prueba de ejercicio días del año
 
 DECLARE
+    V_FECHA DATE;
     V_MES INT;
     V_DIA INT;
     V_ANO INT;
-    V_FECHA DATE;
-    
-    
-BEGIN
+    V_FECHA_FINAL DATE;
+    BEGIN
 
-    V_FECHA := TO_DATE('&FECHA');
-    V_DIA := TO_NUMBER(TO_CHAR(V_FECHA), DD);
-    V_MES := TO_NUMBER(TO_CHAR(V_FECHA), MM);
-    V_ANO := TO_NUMBER(TO_CHAR(V_FECHA), YYYY);
+    V_FECHA := TO_DATE('&FECHA', 'DD/MM/YYYY');
+    V_DIA := TO_NUMBER(TO_CHAR(V_FECHA, 'DD'));
+    V_MES := TO_NUMBER(TO_CHAR(V_FECHA, 'MM'));
+    V_ANO := TO_NUMBER(TO_CHAR(V_FECHA, 'YY'));
 
+    v_mes := ( v_mes + 5 );
 
+    IF (V_MES = 13) THEN
+        V_ANO := (V_ANO +1);
+        V_MES := 1;
 
+    ELSIF (V_MES = 14) THEN
+        V_ANO := (V_ANO +1);
+        V_MES := 2;
+    END if;
 
+    V_FECHA_FINAL := to_date ( v_ano || '-' || v_mes || '-' || v_dia,'YYYY-MM-DD' );
 
+    dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA);
+    dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA_FINAL);
 END;
+
+
+undefine fecha;
 
 -- esta es una prueba si funciona bien mi repositorio.

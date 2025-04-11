@@ -293,7 +293,7 @@ IF --- CONSULTA --- THEN CÓDIGO
 
 
 DECLARE
- V_NUMERO INT;
+    V_NUMERO INT;
 BEGIN
     V_NUMERO := &NUMERO;
     IF (V_NUMERO > 0) THEN
@@ -504,7 +504,7 @@ SELECT MAX(2,3,5) FROM DUAL;
 
 
 
--- 
+----- prueba de ejercicio días del año
 
 DECLARE
     V_MES INT;
@@ -525,3 +525,5 @@ BEGIN
 
 
 END;
+
+-- esta es una prueba si funciona bien mi repositorio.

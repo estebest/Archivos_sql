@@ -512,6 +512,15 @@ DECLARE
     V_DIA INT;
     V_ANO INT;
     V_FECHA_FINAL DATE;
+    op_1 int;
+    op_2 int;
+    op_3 int;
+    op_4 int;
+    op_5 int;
+    op_6 int;
+    op_7 int;
+    op_8 int;
+
     BEGIN
 
     V_FECHA := TO_DATE('&FECHA', 'DD/MM/YYYY');
@@ -531,9 +540,23 @@ DECLARE
     END if;
 
     V_FECHA_FINAL := to_date ( v_ano || '-' || v_mes || '-' || v_dia,'YYYY-MM-DD' );
+    op_1 := ((V_MES +1)*3)/5;
+    op_2 := V_ANO/4;
+    op_3 := V_ANO/100;
+    op_4 := V_ANO/400;
+    op_5 := V_DIA + (v_MES * 2) + V_ANO + op_1 + op_2 - op_3 + 4 +2;
+    op_6 := op_5/7;
+    op_7 := op_5 - (op_6 * 7);
+
 
     dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA);
     dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA_FINAL);
+
+    dbms_output.put_line('EL día es: ' || to_char(v_fecha_final, 'day'));
+    dbms_output.put_line('Del mes: ' || to_char(v_fecha_final, 'month'));
+    dbms_output.put_line('Del año: ' || to_char(v_fecha_final, 'year'));
+    dbms_output.put_line('El día final es: ' || op_7);
+
 END;
 
 

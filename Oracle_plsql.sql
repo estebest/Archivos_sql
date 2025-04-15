@@ -578,4 +578,42 @@ END;
 
 undefine fecha;
 
--- esta es una prueba si funciona bien mi repositorio.
+--- ejercicio 2 calcular salario
+
+declare
+N_horas int;
+P_horas int;
+Distancia int;
+pago_total int;
+h_extra int;
+dieta int;
+
+begin
+
+N_horas := 40;
+P_horas := 10;
+Distancia := 400;
+
+pago_total := N_horas * P_horas;
+
+if (N_horas > 36) then
+    h_extra := N_horas - 36;
+else 
+    h_extra := 0;
+end if;
+
+if (distancia < 100) then
+    dieta := 0;
+elsif (distancia > 100 and distancia < 250) then
+    dieta := 200;
+elsif (distancia > 251 and distancia < 500) then
+    dieta := 400;
+elsif (distancia > 501) then
+    dieta := 0;
+end if;
+
+pago_total := pago_total + (h_extra * 2) + dieta;
+
+DBMS_OUTPUT.PUT_LINE('El pago total es de: €' || pago_total);
+
+end; 

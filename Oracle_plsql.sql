@@ -519,16 +519,15 @@ DECLARE
     op_5 int;
     op_6 int;
     op_7 int;
-    op_8 int;
+    texto_dia varchar2(50);
+    
 
     BEGIN
 
-    V_FECHA := TO_DATE('&FECHA', 'DD/MM/YYYY');
+    V_FECHA := TO_DATE('22/06/1983', 'DD/MM/YYYY');
     V_DIA := TO_NUMBER(TO_CHAR(V_FECHA, 'DD'));
     V_MES := TO_NUMBER(TO_CHAR(V_FECHA, 'MM'));
     V_ANO := TO_NUMBER(TO_CHAR(V_FECHA, 'YY'));
-
-    v_mes := ( v_mes + 5 );
 
     IF (V_MES = 13) THEN
         V_ANO := (V_ANO +1);
@@ -544,18 +543,35 @@ DECLARE
     op_2 := V_ANO/4;
     op_3 := V_ANO/100;
     op_4 := V_ANO/400;
-    op_5 := V_DIA + (v_MES * 2) + V_ANO + op_1 + op_2 - op_3 + 4 +2;
+    op_5 := V_DIA + (v_MES * 2) + V_ANO + op_1 + op_2 - op_3 + op_4 +2;
     op_6 := op_5/7;
-    op_7 := op_5 - (op_6 * 7);
+    op_7 := (op_5 - (op_6 * 7))+1;
+
+    if (op_7=0) THEN
+        texto_dia := 'Sábado';
+    elsif (op_7=1) THEN
+        texto_dia := 'Domingo';
+    elsif (op_7 = 2) THEN
+        texto_dia := 'Lunes';
+    elsif (op_7 =3) THEN
+        texto_dia := 'Martes';
+    elsif (op_7 = 4) THEN
+        texto_dia := 'Miércoles';
+    elsif (op_7 = 5) THEN
+        texto_dia := 'Jueves';
+    elsif (op_7 = 6) THEN
+        texto_dia := 'viernes';
+
+    end if;
 
 
-    dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA);
+    dbms_output.put_line('Inicio DE PROGRAMA ' || V_FECHA);
     dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA_FINAL);
 
     dbms_output.put_line('EL día es: ' || to_char(v_fecha_final, 'day'));
     dbms_output.put_line('Del mes: ' || to_char(v_fecha_final, 'month'));
     dbms_output.put_line('Del año: ' || to_char(v_fecha_final, 'year'));
-    dbms_output.put_line('El día final es: ' || op_7);
+    dbms_output.put_line('El día final es: ' || texto_dia);
 
 END;
 

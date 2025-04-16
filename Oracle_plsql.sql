@@ -590,7 +590,7 @@ dieta int;
 
 begin
 
-N_horas := 40;
+N_horas :=  40;
 P_horas := 10;
 Distancia := 400;
 
@@ -598,6 +598,8 @@ pago_total := N_horas * P_horas;
 
 if (N_horas > 36) then
     h_extra := N_horas - 36;
+    dbms_output.put_line('Tiene horas extra');
+    dbms_output.put_line('Total horas extra:' || h_extra);
 else 
     h_extra := 0;
 end if;
@@ -614,6 +616,75 @@ end if;
 
 pago_total := pago_total + (h_extra * 2) + dieta;
 
+dbms_output.put_line('Dietas provinciales: €' || dieta);
 DBMS_OUTPUT.PUT_LINE('El pago total es de: €' || pago_total);
 
+
 end; 
+
+-- Prueba 3
+
+declare
+
+dni int;
+resultado int;
+letra varchar2(1);
+
+begin
+    dni := 12345678;
+
+    resultado:=  (round(dni/23)*23) - dni;
+
+    if (resultado = 0) THEN
+        letra := 'T';
+    elsif (resultado = 1) THEN
+        letra := 'R';
+    elsif (resultado = 2) THEN
+        letra := 'W';
+    elsif (resultado = 3) THEN
+        letra := 'A';
+    elsif (resultado = 4) THEN
+        letra := 'G';
+    elsif (resultado = 5) THEN
+        letra := 'M';
+    elsif (resultado = 6) THEN
+        letra := 'Y';
+    elsif (resultado = 7) THEN
+        letra := 'F';        
+    elsif (resultado = 8) THEN
+        letra := 'P';
+    elsif (resultado = 9) THEN
+        letra := 'D';
+    elsif (resultado = 10) THEN
+        letra := 'X';
+    elsif (resultado = 11) THEN
+        letra := 'B';
+    elsif (resultado = 12) THEN
+        letra := 'N';
+    elsif (resultado = 13) THEN
+        letra := 'J';
+    elsif (resultado = 14) THEN
+        letra := 'Z';
+    elsif (resultado = 15) THEN
+        letra := 'S';
+    elsif (resultado = 16) THEN
+        letra := 'Q';
+    elsif (resultado = 17) THEN
+        letra := 'V';
+    elsif (resultado = 18) THEN
+        letra := 'H';
+    elsif (resultado = 19) THEN
+        letra := 'L';
+    elsif (resultado = 20) THEN
+        letra := 'C';
+    elsif (resultado = 21) THEN
+        letra := 'K';
+    elsif (resultado = 22) THEN
+        letra := 'E';
+    elsif (resultado = 23) THEN
+        letra := 'T';
+    end if;
+
+    dbms_output.put_line('la letra del dni ' || dni || ' es: ' || letra);
+
+end;

@@ -688,3 +688,230 @@ begin
     dbms_output.put_line('la letra del dni ' || dni || ' es: ' || letra);
 
 end;
+
+/*
+
+21 de abril de 2025
+
+LOOPS
+
+LAS VARIABLES CONTADOR SUELEN LLAMARSE CON UNA SOLA LETRA
+
+BÚCLES CONDICIONALES (SON PELIGROSOS PORQUE PUDEN SER INFINITOS): 
+SIMPLE: ENTRA AL BÚCLE PERO TOCA CONIGURAR SI LA CONDICIÓN SE CUMPLE. EVALÚA EL CIERRE AL FINAL
+WHILE: EVALUA LA CONDICIÓN PARA ENTRAR AL BÚCLE, SI NO PUES NO LO HACE/ SE PUEDE USAR LA OPCIÓN EXIT
+
+BÚCLES FOR (SON NÚMERICOS DONDE INDICO DONDE EMPIEA Y DONDE CIERRA, NO ES NECESARIO DECLARAR LA VARIABLE)
+
+*/
+
+-- BÚCLE SIMPLE (LOOP .. END LOOP)
+-- SUMA DE LOS PRIMEROS 100 NÚMEROS
+-- EN DECLARE SE DEBE INICIAR I, SINO SERÁ NULL
+
+DECLARE
+    i INT;
+    SUMA INT;
+
+BEGIN
+    i := 1;
+    suma := 0;
+    
+    LOOP
+
+        SUMA := SUMA +i;
+        i := i+1;
+        EXIT WHEN i = 101;
+
+    END LOOP;
+    
+    dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
+
+END;
+
+-- SINTAXÍS USANDO EL WHILE
+-- LA CONDICIÓN SE EVALÚA ANTES DE ENTRAR
+
+DECLARE
+    i int := 1;
+    SUMA INT := 0;
+
+BEGIN
+    WHILE i <= 100 LOOP
+        SUMA := SUMA + i;
+        I := 1+I;
+
+    END LOOP;
+
+    dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
+
+END;
+
+-- CONDICIONAL FOOR LOOP
+-- SUELE SER EL MÁS UTILIZADO
+-- SABEMOS EL INICIO Y EL FINAL
+
+DECLARE
+    SUMA INT;
+
+BEGIN
+    SUMA := 0;
+
+    FOR I IN 1.. 100 LOOP
+
+        SUMA := SUMA +I;
+        dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
+       
+    END LOOP;
+
+     dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
+
+END;
+
+-- ETIQUETA GO TO
+-- SE SALTA BLOQUES DEL CÓDIGO Y SE MENCIONA DONDE DEBERÍA REAPARCER
+-- NO SE PUEDE CREAR ETIQUETAS CON EL MISMO NOMBRE
+-- LA ETIQUETA DEBE ESTAR SIEMPRE PARA ABAJO, OEA EN EL BEGIN
+-- NO PUEDE ESTAR ANTES DEL IF O EN MITAD DEL LOOP
+
+DECLARE
+    SUMA INT;
+
+BEGIN
+    SUMA := 0;
+    dbms_output.put_line('INICIO');
+    GOTO CODIGO;
+    dbms_output.put_line('ANTES DEL BÚCLE');
+
+    FOR I IN 1.. 100 LOOP
+
+        SUMA := SUMA +I;
+       
+    END LOOP;
+    << CODIGO >>
+    dbms_output.put_line('DESUPUÉS DEL BÚCLE');
+     dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
+
+END;
+
+-- EJEMPLOSS
+
+-- UN BÚCLE PARA MOSTRAR LOS NÚMERO ENTRE 1 Y 10 
+-- CON UN BÚCLE WHILE Y FOR
+
+DECLARE
+    I INT := 0;
+    
+BEGIN
+    WHILE I < 11 LOOP
+        I:= I+1;
+        dbms_output.put_line('EL NÚMERO ES:'|| I );
+    
+    END LOOP;
+    dbms_output.put_line('FINAL DE PROCESO');
+
+END;
+
+-- EJERCICIO LOOP FOR
+
+DECLARE
+   
+BEGIN
+
+    FOR I IN 1..10 LOOP
+        dbms_output.put_line('EL NÚMERO ES:'|| I );
+    
+    END LOOP;
+
+END;
+
+-- PEDIR AL USUARIO UN NÙMERO INICIAL Y OTRO FINAL
+-- MOSTRAR LOS NÚMEROS QUE HAY ENTRE EL RANGO 
+-- SE LE PUEDE AGREGAR UN IF PARA MEJORAR LA CALIDAD
+
+DECLARE
+
+    N_INICIAL INT;
+    N_FINAL INT;
+
+BEGIN
+    N_INICIAL := &NUM1;
+    N_FINAL := &NUM2;
+
+    IF (N_INICIAL >= N_FINAL) THEN
+
+         dbms_output.put_line('EL NÚMERO INICIAL DEBE SER MAYOR AL FINAL');
+
+    ELSE 
+
+        FOR I IN N_INICIAL .. N_FINAL LOOP
+            dbms_output.put_line('EL NÚMERO ES:'|| I );
+        END LOOP;
+
+    END IF;
+
+END;
+
+UNDEFINE NUM1;
+UNDEFINE NUM2;
+
+-- COMBINACIÓN
+-- UN BÚCLE CON UN INICIO Y UN FIN. MOSTRAR LOS PARES QUE HAY ENTRE EL INICIO Y EL FIN
+
+
+DECLARE
+
+    N_INICIAL INT;
+    N_FINAL INT;
+    RESULTADO INT := 0;
+
+BEGIN
+    N_INICIAL := &NUM1;
+    N_FINAL := &NUM2;
+
+    FOR I IN N_INICIAL .. N_FINAL LOOP
+
+        RESULTADO := MOD(I,2);
+
+        IF (RESULTADO = 0) THEN
+        dbms_output.put_line('ES PAR EL NÚMERO: '|| I  );
+
+        END IF;
+   
+    END LOOP;
+
+    dbms_output.put_line('FINAL DEL PROGRAMA'); 
+END;
+
+-- CUALQUIER NÚMERO SIEMPRE LLEGARÀ A SER 1 SIGUIENDO UNA SERIE DE INSTRUCCIONES
+-- SI EL NÚMERO ES PAR SE DIVIDE ENTRE 2
+-- SI ES IMPAR SE MÙLTIPLICA POR 3 Y SE SUMA 1
+
+
+DECLARE
+    INICIO INT := &V_INICIO;
+    I INT := 0;
+
+BEGIN
+    LOOP
+
+        IF (MOD(INICIO,2) = 0 ) THEN
+            INICIO := INICIO /2;
+            dbms_output.put_line(INICIO );
+            I := I+1;
+
+        ELSE
+            INICIO := (INICIO * 3) +1;
+            dbms_output.put_line(INICIO);
+            I := I+1;
+
+        END IF;
+
+    EXIT WHEN INICIO = 1;
+    END LOOP;
+
+     dbms_output.put_line('EL PROCESO TERMINÓ EN: '|| I || ' ITERACCIONES');
+
+END;
+
+UNDEFINE V_INICIO;

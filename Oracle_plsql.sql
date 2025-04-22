@@ -1,3 +1,5 @@
+SET SERVEROUTPUT ON;
+
 -- Acà se define el plato fuerte
 -- este es el certificado único y propio de oracle
 -- todo esto es único y acá está la parte de desarrollo y programación
@@ -98,7 +100,7 @@ END;
 
 
 UNDEFINE DEPT;
-
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /* 
 
 10 de abril de 2025
@@ -436,7 +438,7 @@ UNDEFINE NUM_3;
 
 -- PEDIR TRES NÚMEROS AL USUARIO
 -- SE DEBE MOTRAR EL MAYOR DE ELLOS
-
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 DECLARE
 
@@ -688,7 +690,7 @@ begin
     dbms_output.put_line('la letra del dni ' || dni || ' es: ' || letra);
 
 end;
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*
 
 21 de abril de 2025
@@ -965,7 +967,7 @@ END;
 
 
 DECLARE
-    V_TEXTO VARCHAR2(50):= '&TEXTO_USUARIO';
+    V_TEXTO VARCHAR2(50):= '&1234';
     V_NUMERO INT;
     V_LENGHT INT;
     N1 INT;
@@ -991,3 +993,229 @@ BEGIN
 END;
 
 UNDEFIN TEXTO_USUARIO;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/*
+
+  22 de abril de 2025
+
+  Cursores
+
+permite almacenar en variables consultas que tena (guardar un elect en variables)
+en pl/sql no se puede usar un select a menos que lo guarde directamente en una variable
+
+EL SELECT SOLO FUNCIONA SI ES UNA SUBCONSULA
+
+SE TIENEN DOS TIPOS DE CURSOS:
+
+IMPLÌCITO: SOLO SE PUEDE DEVOLVER UNA ÚNICA FILA Y NO TENGO QUE DECLARARLO
+EXPLÌCITO: TENGO QUE DECLARAR EL CURSO Y EL VALOR IS
+
+*/
+
+-- INSERTAR 5 DEPARTAMENTOS EN UN BLOQUE PL/SQL DINÁMICO A TRAVÉS DE UN BÚCLE
+declare
+
+    V_NOMBRE DEPT.DNOMBRE%TYPE;
+    V_LOC DEPT.LOC%TYPE;
+
+begin
+
+    FOR I IN 1..5 LOOP
+        V_NOMBRE := 'DEPARTAMENTO_' || I;
+        V_LOC := 'LOCALIDAD_'|| I;
+        INSERT INTO DEPT VALUES ((SELECT MAX(DEPT_NO)+1 FROM DEPT), V_NOMBRE, V_LOC);
+
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('FIN DEL PROGRAMA');
+end;
+
+SELECT * FROM DEPT;
+
+ROLLBACK;
+
+-- REALIAR UN BLOQUE QUE PEDIRÁ UN NÚMERO Y MOSTRARÁ EL DEPARTAMENTO CON DICHO NÚMERO
+-- YA QUE SALE SUSTITUCIÓN CANCELADA, LO PONGO COMO 10
+
+DECLARE
+    V_ID INT := 10;
+
+BEGIN
+    SELECT * FROM DEPT WHERE DEPT_NO = V_ID;
+
+END;
+
+-- EJEMPLO DE CURSOR IMPLÌCITO, DONDE VOY A RECUPERAR EL OFICIO DEL APELLIDO REY
+
+DECLARE 
+
+    V_OFICIO EMP.OFICIO%TYPE;
+
+
+BEGIN
+    SELECT OFICIO INTO V_OFICIO FROM EMP WHERE UPPER(APELLIDO)= 'REY';
+    DBMS_OUTPUT.PUT_LINE('EL APELLIDO DE REY ES '|| V_OFICIO);
+
+END;
+
+-- EJEMPLO DE CURSOR EXPLÌCITO
+-- PUEDE DEVOLVER MÀS DE UNA FILA Y ES NECESARIO DECALRARLOS A TRAVÉS DE LA PALABRA CURSOR
+
+DECLARE
+    V_APE EMP.APELLIDO%TYPE;
+    V_SAL EMP.SALARIO%TYPE;
+    -- DECLARAMOS CURSOR CON UNA CONSULTA
+    -- LA CONSULTA DEBE TENER LOS MISMOS DATOS PARA HACE EL FET (TANTOS EN EL SELECT COMO CON LA DECLARACIÓN)
+    CURSOR CURSOREMP IS 
+    SELECT APELLIDO, SALARIO FROM EMP;
+
+BEGIN
+    -- SE ABRE EL CURSOS
+    OPEN CURSOREMP;
+    LOOP
+        -- EXTREMOS LOS DATOS DEL CUROSRA TRAVÉS DE FTCH
+        FETCH CURSOREMP INTO V_APE, V_SAL;
+
+        DBMS_OUTPUT.PUT_LINE('APELLIDO: '|| V_APE || ',SALARIO: '|| V_SAL);
+        EXIT WHEN CURSOREMP%NOTFOUND; 
+
+    END LOOP;
+    CLOSE CURSOR;
+
+END;
+
+-- ATRIBUTOSS 
+-- NOTFOUND: SE ACTIVA SI NO HA RECUPERADO NINGUNA FILA EL CURSOR
+-- FOUND DONDE HA RECUPERADO ALGUNA FILA
+-- ROWCOUNT: NÑUMERO D FILAQUE CONTIENE EL CURSOR
+-- IS OPEN
+-- ATRIBUTOS PARACONSULTA DE ACCIÓN
+
+-- IMCREMENTAR EN 1 EL SALARIO DE LOS EMPLEADOS
+BEGIN 
+    UPDATE EMP SET SALARIO = SALARIO +1
+    WHERE DEPT_NO =10;
+    DBMS_OUTPUT.PUT_LINE('EMPLEADOS: '|| SQL%ROWCOUNT);
+
+END;
+
+
+----
+
+-- INCREMENTAR EN 10000 AL EMPLEADO QUE MENOS COBRE EN LA EMPRESA
+-- 
+
+SELECT * FROM EMP;
+
+
+DECLARE
+
+    V_SALARIO EMP.SALARIO%TYPE;
+    V_APELLIDO EMP.APELLIDO%TYPE;
+
+BEGIN 
+
+    SELECT MIN(SALARIO) INTO V_SALARIO FROM EMP;
+    SELECT APELLIDO INTO V_APELLIDO FROM EMP WHERE SALARIO = V_SALARIO;
+    UPDATE EMP SET SALARIO = SALARIO + 10000 WHERE SALARIO = V_SALARIO;
+    DBMS_OUTPUT.PUT_LINE('SALARIO INCREMENTADO A '|| SQL%ROWCOUNT || ' EMPLEADOS');
+    DBMS_OUTPUT.PUT_LINE('La persona a la que se le subió es '|| V_APELLIDO);
+END;
+
+
+-- rEALIZAR UN CÓDIGO PL/SQL DONDE SE PEDIRÁ EL NÚMERO, NOMBRE Y LOCALIDAD DE UN DEPARTAMENTO
+-- SI EL DEPARTAMENTO EXISTE, MODIFICAMOS SU NOMBRE Y LOCALIDAD
+-- SI EL DEPARTAMENTO NO EXISTE, LO MODIFICAMOS 
+
+
+SELECT * FROM DEPT;
+
+
+DECLARE
+    -- VARIABLES PARA AGREGAR
+    V_DEPT_NO DEPT.DEPT_NO%TYPE;
+    V_DNOMBRE DEPT.DNOMBRE%TYPE;
+    V_LOC DEPT.LOC%TYPE;
+    V_EXISTE DEPT.DEPT_NO%TYPE;
+    
+    -- APERTURA DEL CURSOR
+    CURSOR CURSORDEPT IS 
+    SELECT DEPT_NO FROM DEPT WHERE DEPT_NO= V_DEPT_NO;
+
+BEGIN
+    -- SE ABREN LOS DATOS DEL USUARIO
+    V_DEPT_NO := 10;
+    V_DNOMBRE := 'I+D';
+    V_LOC :=  'GIJON';
+
+    -- INICIA EL CURSOR /EL FETCH ES OPCIONAL/ 
+    OPEN CURSORDEPT;
+    FETCH CURSORDEPT INTO V_EXISTE;
+
+    IF CURSORDEPT%FOUND  THEN
+        UPDATE DEPT SET DNOMBRE = V_DNOMBRE WHERE DEPT_NO = V_DEPT_NO;
+        UPDATE DEPT SET LOC = V_LOC WHERE DEPT_NO = V_DEPT_NO;
+        DBMS_OUTPUT.PUT_LINE('UPDATE');
+
+    else
+        INSERT INTO DEPT VALUES (V_DEPT_NO, V_DNOMBRE, V_LOC); 
+        DBMS_OUTPUT.PUT_LINE('INSERT');
+
+    end if;
+
+END;
+
+--- count puede ser una opción muy útil que funciona/ incluso sin cursor
+declare
+   v_dept_no dept.dept_no%type;
+   v_dnombre dept.dnombre%type;
+   v_loc     dept.loc%type;
+   v_existe  dept.dept_no%type;
+begin
+   v_dept_no := 10;
+   v_dnombre := 'I+D';
+   v_loc := 'GIJON';
+   select count(dept_no)
+     into v_existe
+     from dept
+    where dept = v_dept_no;
+   if ( v_existe = 0 ) then
+      dbms_output.put_line('INSERT');
+   else
+      dbms_output.put_line('UPDATE');
+   end if;
+end;
+
+-- REALIZAR UN CÓDIGO PARA MODIFICAR EL SALARIO DEL EMPLEADO AROYO
+-- SI EL EMPLEADO COBRA MÁS DE 250.000 SE LE BAJA EL SUELDO EN 10.000
+-- SI NO, SE SUBE EL SUELDO EN 100.000
+
+SELECT * FROM EMP WHERE APELLIDO = 'arroyo';
+
+
+declare
+   v_salario  emp.salario%type;
+   v_apellido emp.apellido%type;
+begin
+   select count(salario)
+     into v_salario
+     from emp
+    where salario > 250000
+      and apellido = 'arroyo';
+
+   if ( v_salario = 0 ) then
+      update emp
+         set
+         salario = salario + 10000
+       where apellido = 'arroyo';
+      dbms_output.put_line('aumento de salario');
+   else
+      update emp
+         set
+         salario = salario - 10000
+       where apellido = 'arroyo';
+      dbms_output.put_line('SALARIO REDUCIDO');
+   end if;
+
+end;

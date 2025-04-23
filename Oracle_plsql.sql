@@ -1219,3 +1219,187 @@ begin
    end if;
 
 end;
+
+
+--- incrementar el salario de los doctores de la paz
+--- si la suma salarial supera 1.000.000 bajamos salarios en 10.000 a todos
+-- si la suma salarial no supera el 1.000.000 subimos un millon
+-- mostrar el número de filas que se han modificado
+
+select * from DOCTOR;
+
+SELECT * FROM HOSPITAL;
+
+
+
+declare
+    -- DECLARO LAS DOS VARIABLES QUE VOY A USAR. UNA PARA LA SUMA DEL SALARIO Y OTRA PARA EL CONTEO DE LO DOCTORES
+   v_salario int;
+   v_paz     int;
+begin
+    -- HAGO UNA CONSULTA QUE GUARDE LAS DOS VARIABLES TENIENDO EN CUNTA LA PRIMAREY KEY
+   select count(doctor_no)
+     into v_paz
+     from doctor
+    inner join hospital
+   on doctor.hospital_cod = hospital.hospital_cod
+    where lower(hospital.nombre) = 'la paz';
+  
+   select sum(doctor.salario)
+     into v_salario
+     from doctor
+    inner join hospital
+   on doctor.hospital_cod = hospital.hospital_cod
+    where lower(hospital.nombre) = 'la paz';
+
+    -- APLICO EL RESPECTIVO CONDICIONAL TENIENDO EN CUENTA LA SUMA DE TODOS LOS SALARIOS DEL HOSPITAL LA PAZ
+   if ( v_salario > 1000000 ) then
+      update doctor
+         set
+         salario = salario - 10.000
+       where hospital_cod = (
+         select hospital_cod
+           from hospital
+          where nombre = 'la paz'
+      );
+      dbms_output.put_line('DOCTORES MÁS POBRES: ' || SQL%ROWCOUNT);
+   else
+      update doctor
+         set
+         salario = salario + 10.000
+       where hospital_cod = (
+         select hospital_cod
+           from hospital
+          where nombre = 'la paz'
+      );
+      dbms_output.put_line('DOCTORES CON SUERTE: ' || SQL%ROWCOUNT);
+   end if;
+
+end;
+
+ROLLBACK;
+
+-- OTRA FORMA
+
+declare
+   v_suma_salarial doctor.salario%type;
+begin
+   select sum(doctor.salario)
+     into v_suma_salarial
+     from doctor
+    inner join hospital
+   on doctor.hospital_cod = hospital.hospital_cod
+    where lower(hospital.nombre) = 'la paz';
+   dbms_output.put_line('SUMA SALARIAL: ' || v_suma_salarial);
+   if ( v_suma_salarial > 1000000 ) then
+      update doctor
+         set
+         salario = salario + 10.000
+       where hospital_cod = (
+         select hospital_cod
+           from hospital
+          where nombre = 'la paz'
+      );
+      dbms_output.put_line('DOCTORES MÁS POBRES: ' || sql%rowcount);
+   else
+      update doctor
+         set
+         salario = salario - 10.000
+       where hospital_cod = (
+         select hospital_cod
+           from hospital
+          where nombre = 'la paz'
+      );
+      dbms_output.put_line('DOCTORES CON SUERTE: ' || sql%rowcount);
+   end if;
+
+end;
+
+
+-- una solución más rápida
+
+declare
+   v_suma_salarial doctor.salario%type;
+   v_codigo hospital.hospital_cod%type;
+
+begin
+    select hospital_cod into v_codigo 
+    from hospital
+    where lower(nombre) = 'la paz';
+    
+
+   select sum(doctor.salario)
+     into v_suma_salarial
+     from doctor
+     where hospital_cod = v_codigo;
+   dbms_output.put_line('SUMA SALARIAL: ' || v_suma_salarial);
+
+   if ( v_suma_salarial > 1000000 ) then
+      update doctor
+         set
+         salario = salario + 10.000
+       where hospital_cod = v_codigo;
+      dbms_output.put_line('DOCTORES MÁS POBRES: ' || sql%rowcount);
+
+   else
+      update doctor
+         set
+         salario = salario - 10.000
+       where hospital_cod = v_codigo;
+      dbms_output.put_line('DOCTORES CON SUERTE: ' || sql%rowcount);
+   end if;
+
+end;
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+describe dept;
+
+
+declare
+    v_id number;
+begin
+    dbms_output.put_line('valor variable ' || v_id);
+end;
+
+
+
+
+-- se puede almacenar todos los departamentos (uno a uno) en un rowtype
+declare
+    v_fila dept%rowtype;
+    cursor cursor_dept is
+    select * from dept;
+
+begin
+    open cursor_dept;
+
+    loop
+        fetch cursor_dept into v_fila;
+        exit when cursor_dept%notfound;
+        dbms_output.put_line('ID ' || v_fila.dept_no||', nombre ' || v_fila.Dnombre || ', localidad '|| v_fila.loc );
+    end loop;
+    
+    close cursor_dept; 
+
+end;
+
+-- hay una sintaxis para cuando hay un cursor que sea màs sencillo. no se abre ni se pone el fetch
+-- e agrega una variable que no hay que declarar
+-- lo ùnico que se necesita es el cursor
+-- acá el alias también es obligatorio 
+
+declare
+   cursor cursor_doctor is
+   select apellido,
+          especialidad
+     from doctor;
+begin
+   for v_reg_doctor in cursor_doctor loop
+      dbms_output.put_line(v_reg_doctor.apellido
+                           || '___'
+                           || v_reg_doctor.especialidad);
+   end loop;
+end;

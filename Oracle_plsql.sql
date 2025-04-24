@@ -1,4 +1,4 @@
-SET SERVEROUTPUT ON;
+   SET SERVEROUTPUT ON;
 
 -- Acà se define el plato fuerte
 -- este es el certificado único y propio de oracle
@@ -22,21 +22,21 @@ SET SERVEROUTPUT ON;
 -- para asignar valor a la variable se usa :=
 -- ejemplo
 
-DECLARE
-    numero int;
+declare
+   numero int;
 begin
     -- LA VARIABLE ES NULL
-    NUMERO :=19;
-END;
+   numero := 19;
+end;
 
 -- SE IMPRIME POR PANTALLA
 declare
     -- DECLARAMO UNA VARIABLE
    numero int;
-   TEXTO VARCHAR2(40);
+   texto  varchar2(40);
 begin
-   TEXTO := 'MI PRIMER PL/SQL';
-   dbms_output.put_line('TEXTO: '|| TEXTO);   
+   texto := 'MI PRIMER PL/SQL';
+   dbms_output.put_line('TEXTO: ' || texto);
    dbms_output.put_line('MI PRIMER BLOQUE ANÓNIMO 1');
    numero := 47;
    dbms_output.put_line('VALOR NÚMERO: ' || numero);
@@ -48,40 +48,45 @@ end;
 
 --POR EJEMPLO SI SE QUIERE PEDIR UNO PARA EL USUARIO// UTILIZAR VARIABLE DE SUSTITUCIÓN PARA EL USUARIO
 
-DECLARE
-    NOMBRE VARCHAR2(30);
-BEGIN
-    NOMBRE := '&DATO';
-    DBMS_OUTPUT.PUT_LINE('SU NOMBRE ES '|| NOMBRE);
-END;
+declare
+   nombre varchar2(30);
+begin
+   nombre := '&DATO';
+   dbms_output.put_line('SU NOMBRE ES ' || nombre);
+end;
 
 -- SE PUEDE UTILIZAR CUALQUIER CARACTERÍSTICA
 
 
-DECLARE
-    FECHA DATE;
-    TEXTO VARCHAR2(50);
-    LONGITUD INT;
-BEGIN
-    FECHA := SYSDATE;
-    TEXTO := '&NOMBRE';
-    LONGITUD :=  LENGTH(TEXTO);
-    dbms_output.put_line('HOY ES: '|| FECHA );
-    dbms_output.put_line('LA LONGITUD DE SU TEXTO ES: ' || LONGITUD);
-    dbms_output.put_line('LA LONGITUD DE SU TEXTO ES: ' || LENGTH(TEXTO));
-END;
+declare
+   fecha    date;
+   texto    varchar2(50);
+   longitud int;
+begin
+   fecha := sysdate;
+   texto := '&NOMBRE';
+   longitud := length(texto);
+   dbms_output.put_line('HOY ES: ' || fecha);
+   dbms_output.put_line('LA LONGITUD DE SU TEXTO ES: ' || longitud);
+   dbms_output.put_line('LA LONGITUD DE SU TEXTO ES: ' || length(texto));
+end;
 
 
 -- PROGRAMA PARA PEDIR NÚMEROS AL USUARIO
 
-DECLARE
-    N1 INT;
-    N2 INT;
-BEGIN
-    N1 := '&N1';
-    N2 := '&N2';
-    dbms_output.put_line('LA SUMA DE' || N1 || ' + ' || N2 || ' = ' || (N1+N2) );
-END;
+declare
+   n1 int;
+   n2 int;
+begin
+   n1 := '&N1';
+   n2 := '&N2';
+   dbms_output.put_line('LA SUMA DE'
+                        || n1
+                        || ' + '
+                        || n2
+                        || ' = '
+                        ||(n1 + n2));
+end;
 
 UNDEFINE N1;
 UNDEFINE N2;
@@ -89,14 +94,18 @@ UNDEFINE N2;
 -- DENTRO DE ESTOS BLOQUES NO SE PUEDEN PONER UN SELECT, AUNQUE SÌ INSSERT UPDATE AND DELETE
 -- LAS VARIABLES NO SE PUEDEN LLAMAR IGUAL QUE LOS NOMBRES
 
-SELECT * FROM EMP;
+select *
+  from emp;
 
-DECLARE
-    V_DEPARTAMENTO INT;
-BEGIN
-    V_DEPARTAMENTO := &DEPT;
-    UPDATE EMP SET SALARIO= SALARIO + 1 WHERE DEPT_NO=V_DEPARTAMENTO;
-END;
+declare
+   v_departamento int;
+begin
+   v_departamento := &dept;
+   update emp
+      set
+      salario = salario + 1
+    where dept_no = v_departamento;
+end;
 
 
 UNDEFINE DEPT;
@@ -115,95 +124,117 @@ end;
 
 */
 
-SELECT * FROM DEPT;
+select *
+  from dept;
 
-DECLARE
-    V_NUMERO DEPT.DEPT_NO%TYPE;
-    V_NOMBRE DEPT.DNOMBRE%TYPE;
-    V_LOCALIDAD DEPT.LOC%TYPE;
-BEGIN
-    V_NUMERO := '&numero';
-    V_NOMBRE := '&nombre';
-    V_LOCALIDAD := '&localidad';
-    INSERT INTO DEPT VALUES (V_NUMERO, V_NOMBRE, V_LOCALIDAD);
-END;
+declare
+   v_numero    dept.dept_no%type;
+   v_nombre    dept.dnombre%type;
+   v_localidad dept.loc%type;
+begin
+   v_numero := '&numero';
+   v_nombre := '&nombre';
+   v_localidad := '&localidad';
+   insert into dept values ( v_numero,
+                             v_nombre,
+                             v_localidad );
+end;
 
 UNDEFINE numero;
 UNDEFINE nombre;
 UNDEFINE localidad;
 
-DELETE FROM DEPT WHERE DNOMBRE='CASTELLANA';
+delete from dept
+ where dnombre = 'CASTELLANA';
 
 -- PRÁCTICA PL/SQL
 -- 1) Crear un bloque anónimo que sume dos números introducidos por teclado y muestre el resultado por pantalla.
 
-DECLARE
-    N1 INT;
-    N2 INT;
-BEGIN
-    N1 := '&N1';
-    N2 := '&N2';
-    dbms_output.put_line('LA SUMA DE' || N1 || ' + ' || N2 || ' = ' || (N1+N2) );
-END;
+declare
+   n1 int;
+   n2 int;
+begin
+   n1 := '&N1';
+   n2 := '&N2';
+   dbms_output.put_line('LA SUMA DE'
+                        || n1
+                        || ' + '
+                        || n2
+                        || ' = '
+                        ||(n1 + n2));
+end;
 
 UNDEFINE N1;
 UNDEFINE N2;
 
 -- 2)     2. Insertar en la tabla EMP un empleado con código 9999 asignado directamente en la variable con %TYPE, apellido ‘PEREZ’, oficio ‘ANALISTA’ y código del departamento al que pertenece 10.
 
-SELECT * FROM EMP;
+select *
+  from emp;
 
-DECLARE
-    V_EMP_NO EMP.EMP_NO%TYPE;
-    V_APELLIDO EMP.APELLIDO%TYPE;
-    V_OFICIO EMP.OFICIO%TYPE;
-    V_DEPT_NO EMP.DEPT_NO%TYPE;
-BEGIN
-    V_EMP_NO := 9999;
-    V_APELLIDO := 'PEREZ';
-    V_OFICIO := 'ANALISTA';
-    V_DEPT_NO := 10;
-    INSERT INTO EMP (EMP_NO, APELLIDO, OFICIO, DEPT_NO)
-    VALUES (V_EMP_NO, V_APELLIDO, V_OFICIO, V_DEPT_NO);
-END;
+declare
+   v_emp_no   emp.emp_no%type;
+   v_apellido emp.apellido%type;
+   v_oficio   emp.oficio%type;
+   v_dept_no  emp.dept_no%type;
+begin
+   v_emp_no := 9999;
+   v_apellido := 'PEREZ';
+   v_oficio := 'ANALISTA';
+   v_dept_no := 10;
+   insert into emp (
+      emp_no,
+      apellido,
+      oficio,
+      dept_no
+   ) values ( v_emp_no,
+              v_apellido,
+              v_oficio,
+              v_dept_no );
+end;
 
 -- 3) Incrementar el salario en la tabla EMP en 200 EUROS a todos los trabajadores que sean ‘ANALISTA’, mediante un bloque anónimo PL, asignando dicho valor a una variable declarada con %TYPE.
 
-SELECT * FROM EMP;
+select *
+  from emp;
 
-DECLARE
-    V_OFICIO EMP.OFICIO%TYPE;
-    V_SALARIO EMP.SALARIO%TYPE;
-BEGIN
-    V_OFICIO := 'ANALISTA';
-    V_SALARIO := 200;
-
-    UPDATE EMP SET SALARIO = (SALARIO + V_SALARIO) WHERE OFICIO= V_OFICIO; 
-END;
+declare
+   v_oficio  emp.oficio%type;
+   v_salario emp.salario%type;
+begin
+   v_oficio := 'ANALISTA';
+   v_salario := 200;
+   update emp
+      set
+      salario = ( salario + v_salario )
+    where oficio = v_oficio;
+end;
 
 --4) Realizar un programa que devuelva el número de cifras de un número entero, introducido por teclado, mediante una variable de sustitución.
 
-DECLARE
-    N1 INT;
-BEGIN
-    N1:= '&1';
-    dbms_output.put_line('EL NÚMERO DE CIFRAS ES: '|| LENGTH(N1) );
-END;
+declare
+   n1 int;
+begin
+   n1 := '&1';
+   dbms_output.put_line('EL NÚMERO DE CIFRAS ES: ' || length(n1));
+end;
 
 UNDEFINE N1;
 
 --5) Crear un bloque PL para insertar una fila en la tabla DEPT. Todos los datos necesarios serán pedidos desde teclado
 
-DECLARE
-    V_NUMERO DEPT.DEPT_NO%TYPE;
-    V_NOMBRE DEPT.DNOMBRE%TYPE;
-    V_LOCALIDAD DEPT.LOC%TYPE;
-BEGIN
-    V_NUMERO := '&numero';
-    V_NOMBRE := '&nombre';
-    V_LOCALIDAD := '&localidad';
-    INSERT INTO DEPT VALUES (V_NUMERO, V_NOMBRE, V_LOCALIDAD);
-END;
+declare
+   v_numero    dept.dept_no%type;
+   v_nombre    dept.dnombre%type;
+   v_localidad dept.loc%type;
+begin
+   v_numero := '&numero';
+   v_nombre := '&nombre';
+   v_localidad := '&localidad';
+   insert into dept values ( v_numero,
+                             v_nombre,
+                             v_localidad );
+end;
 
 UNDEFINE numero;
 UNDEFINE nombre;
@@ -211,70 +242,77 @@ UNDEFINE localidad;
 
 --6) Crear un bloque PL que actualice el salario de los empleados que no cobran comisión en un 5%.
 
-SELECT * FROM EMP;
+select *
+  from emp;
 
-DECLARE
-    V_AUMENTO INT;
-BEGIN
-    V_AUMENTO := 0.05;
-    
-    UPDATE EMP SET SALARIO= (SALARIO + (SALARIO*V_AUMENTO) +1 ) WHERE COMISION = 0;
+declare
+   v_aumento int;
+begin
+   v_aumento := 0.05;
+   update emp
+      set
+      salario = ( salario + ( salario * v_aumento ) + 1 )
+    where comision = 0;
 
-END;
+end;
 
 --7) Crear un bloque PL que almacene la fecha del sistema en una variable. Solicitar un número de meses por teclado y mostrar la fecha del sistema incrementado en ese número de meses.
 
-DECLARE
-    
-    V_MES INT;
-    V_DATE DATE;
-
-BEGIN
-    v_MES := '&MES';
-    V_DATE:= V_MES + SYSDATE;
-    dbms_output.put_line('EL AUMENTO ES DE: ' || V_MES || ' MESES, LA NUEVA FECHA ES: ' || V_DATE);
-    
-END;
+declare
+   v_mes  int;
+   v_date date;
+begin
+   v_mes := '&MES';
+   v_date := v_mes + sysdate;
+   dbms_output.put_line('EL AUMENTO ES DE: '
+                        || v_mes
+                        || ' MESES, LA NUEVA FECHA ES: '
+                        || v_date);
+end;
 
 
 -- 8) Introducir dos números por teclado y devolver el resto de la división de los dos números.
 
-DECLARE
+declare
+   n1 int;
+   n2 int;
+begin
+   n1 := '&NUM_1';
+   n2 := '&NUM_2';
+   dbms_output.put_line('EL RESTO DE LA DIVISION ENTRE '
+                        || n1
+                        || ' Y '
+                        || n2
+                        || ' ES: '
+                        || mod(
+      n1,
+      n2
+   ));
 
-    N1 INT;
-    N2 INT;
-
-BEGIN
-    N1:= '&NUM_1';
-    N2:= '&NUM_2';
-
-    dbms_output.put_line('EL RESTO DE LA DIVISION ENTRE '|| N1 || ' Y '|| N2|| ' ES: ' || MOD(N1,N2));
-
-END;
+end;
 
 
 --9) Solicitar un nombre por teclado y devolver ese nombre con la primera inicial en mayúscula.
 
-DECLARE
-    V_NOMBRE1 VARCHAR2(50);
-
-BEGIN
-    V_NOMBRE1 := '&NOMBRE';
-    dbms_output.put_line(INITCAP(V_NOMBRE1));
-
-END;
+declare
+   v_nombre1 varchar2(50);
+begin
+   v_nombre1 := '&NOMBRE';
+   dbms_output.put_line(initcap(v_nombre1));
+end;
 
 UNDEFINE NOMBRE;
 
 --10) Crear un bloque anónimo que permita borrar un registro de la tabla emp introduciendo por parámetro un número de empleado
 
-DECLARE
-    V_EMP_NO EMP.EMP_NO%TYPE;
-BEGIN
-    V_EMP_NO := '&EMPLEADO_NUMERO';
-    DELETE FROM EMP WHERE EMP_NO = V_EMP_NO;
+declare
+   v_emp_no emp.emp_no%type;
+begin
+   v_emp_no := '&EMPLEADO_NUMERO';
+   delete from emp
+    where emp_no = v_emp_no;
 
-END;
+end;
 
 /*
 
@@ -294,69 +332,60 @@ IF --- CONSULTA --- THEN CÓDIGO
 -- EL ELSE DEPENDE DE LA PREGUNTA/// TENER PRESENTE IF - ELSIF - ELSE - END IF
 
 
-DECLARE
-    V_NUMERO INT;
-BEGIN
-    V_NUMERO := &NUMERO;
-    IF (V_NUMERO > 0) THEN
-        DBMS_OUTPUT.PUT_LINE('POSITIVO: '|| V_NUMERO);
-    ELSIF (V_NUMERO < 0) THEN
-        DBMS_OUTPUT.PUT_LINE('NEGATIVO: '|| V_NUMERO);
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('NI POSITIVO, NI NEGATIVO, ES:'|| V_NUMERO);
-    END IF;
+declare
+   v_numero int;
+begin
+   v_numero := &numero;
+   if ( v_numero > 0 ) then
+      dbms_output.put_line('POSITIVO: ' || v_numero);
+   elsif ( v_numero < 0 ) then
+      dbms_output.put_line('NEGATIVO: ' || v_numero);
+   else
+      dbms_output.put_line('NI POSITIVO, NI NEGATIVO, ES:' || v_numero);
+   end if;
         --DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-END;
+end;
 
 -- EJEMPLO CON ESTANCIONES
 
 UNDEFINE NUMERO;
 
-DECLARE
-    V_NUMERO INT;
+declare
+   v_numero int;
+begin
+   v_numero := &numero;
+   if ( v_numero = 1 ) then
+      dbms_output.put_line('PRIMAVERA: ' || v_numero);
+   elsif ( v_numero = 2 ) then
+      dbms_output.put_line('VERANO: ' || v_numero);
+   elsif ( v_numero = 3 ) then
+      dbms_output.put_line('OTOÑO: ' || v_numero);
+   elsif ( v_numero = 4 ) then
+      dbms_output.put_line('INVIERNO: ' || v_numero);
+   else
+      dbms_output.put_line('ERROR, ESTÁ MAL: ' || v_numero);
+   end if;
+   dbms_output.put_line('FIN DE PROGRAMA');
+end;
 
-BEGIN
-    V_NUMERO := &NUMERO;
-    IF (V_NUMERO = 1) THEN
-    DBMS_OUTPUT.PUT_LINE ('PRIMAVERA: '|| V_NUMERO);
-
-    ELSIF (V_NUMERO = 2) THEN
-    DBMS_OUTPUT.PUT_LINE('VERANO: '|| V_NUMERO);
-
-    ELSIF (V_NUMERO = 3)THEN
-    DBMS_OUTPUT.PUT_LINE('OTOÑO: '|| V_NUMERO);
-
-    ELSIF (V_NUMERO = 4) THEN
-    DBMS_OUTPUT.PUT_LINE('INVIERNO: '|| V_NUMERO);
-
-    ELSE
-    DBMS_OUTPUT.PUT_LINE('ERROR, ESTÁ MAL: '|| V_NUMERO);
-
-    END IF;
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-END;
-
-DECLARE
-    N1 INT;
-    N2 INT;
-
-BEGIN
-    N1 := &NUM_1;
-    N2 := &NUM_2;
-    
-    IF (N1 > N2) THEN
-        DBMS_OUTPUT.PUT_LINE ('EL NÚMERO MAYOR ES: '|| N1);
-
-    ELSIF (N2 > N1) THEN
-        DBMS_OUTPUT.PUT_LINE ('EL NÚMERO MAYOR ES: '|| N2);
-
-    ELSE
-        DBMS_OUTPUT.PUT_LINE (N1 || ' Y ' || N2 || ' SON IGUALES');
-
-    END IF;
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-
-END;
+declare
+   n1 int;
+   n2 int;
+begin
+   n1 := &num_1;
+   n2 := &num_2;
+   if ( n1 > n2 ) then
+      dbms_output.put_line('EL NÚMERO MAYOR ES: ' || n1);
+   elsif ( n2 > n1 ) then
+      dbms_output.put_line('EL NÚMERO MAYOR ES: ' || n2);
+   else
+      dbms_output.put_line(n1
+                           || ' Y '
+                           || n2
+                           || ' SON IGUALES');
+   end if;
+   dbms_output.put_line('FIN DE PROGRAMA');
+end;
 
 UNDEFINE NUM_1;
 UNDEFINE NUM_2;
@@ -364,26 +393,31 @@ UNDEFINE NUM_2;
 
 --  pedir un número al usuario e indicar si es par
 
-SELECT MOD(9,2) AS RESTO FROM DUAL;
+select mod(
+   9,
+   2
+) as resto
+  from dual;
 
-DECLARE
-    N1 INT;
-    
-BEGIN
-    N1 := &NUM_1;
-    IF (MOD(N1,2)= 0 ) THEN
-        DBMS_OUTPUT.PUT_LINE ('EL NÚMERO ' || ' ES PAR');
-
-    ELSIF (MOD(N1,2) > 0) THEN
-        DBMS_OUTPUT.PUT_LINE ('EL NÚMERO ' || ' ES IMPAR');
-
-    ELSE
-        DBMS_OUTPUT.PUT_LINE ('HAY UN ERROR');
-
-    END IF;
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-
-END;
+declare
+   n1 int;
+begin
+   n1 := &num_1;
+   if ( mod(
+      n1,
+      2
+   ) = 0 ) then
+      dbms_output.put_line('EL NÚMERO ' || ' ES PAR');
+   elsif ( mod(
+      n1,
+      2
+   ) > 0 ) then
+      dbms_output.put_line('EL NÚMERO ' || ' ES IMPAR');
+   else
+      dbms_output.put_line('HAY UN ERROR');
+   end if;
+   dbms_output.put_line('FIN DE PROGRAMA');
+end;
 
 UNDEFINE NUM_1;
 
@@ -395,40 +429,40 @@ UNDEFINE NUM_1;
 -- Si la letra es vocal 
 
 
-DECLARE
-    V_LETRA VARCHAR(1);
-
-BEGIN
-    V_LETRA := LOWER('&LETRA');
-    IF (V_LETRA IN ('a','e','i','o','u')) THEN
-        DBMS_OUTPUT.PUT_LINE('ES UNA VOCAL '|| V_LETRA);
-    
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('ES UNA CONSONANTE' || V_LETRA);
-
-    END IF;
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-END;
+declare
+   v_letra varchar(1);
+begin
+   v_letra := lower('&LETRA');
+   if ( v_letra in ( 'a',
+                     'e',
+                     'i',
+                     'o',
+                     'u' ) ) then
+      dbms_output.put_line('ES UNA VOCAL ' || v_letra);
+   else
+      dbms_output.put_line('ES UNA CONSONANTE' || v_letra);
+   end if;
+   dbms_output.put_line('FIN DE PROGRAMA');
+end;
 
 -- ES EL MISMO JERCICIO CON DOS OPERADORES
 
 
-DECLARE
-    V_LETRA VARCHAR(1);
-
-BEGIN
-    V_LETRA := LOWER('&LETRA');
-    IF (V_LETRA = 'a' OR V_LETRA = 'e' OR V_LETRA = 'i' OR
-    V_LETRA = 'o' OR V_LETRA = 'u') THEN
-        DBMS_OUTPUT.PUT_LINE('ES UNA VOCAL '|| V_LETRA);
-    
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('ES UNA CONSONANTE ' || V_LETRA);
-
-    END IF;
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-
-END;
+declare
+   v_letra varchar(1);
+begin
+   v_letra := lower('&LETRA');
+   if ( v_letra = 'a'
+   or v_letra = 'e'
+   or v_letra = 'i'
+   or v_letra = 'o'
+   or v_letra = 'u' ) then
+      dbms_output.put_line('ES UNA VOCAL ' || v_letra);
+   else
+      dbms_output.put_line('ES UNA CONSONANTE ' || v_letra);
+   end if;
+   dbms_output.put_line('FIN DE PROGRAMA');
+end;
 
 
 UNDEFINE NUM_1;
@@ -440,142 +474,178 @@ UNDEFINE NUM_3;
 -- SE DEBE MOTRAR EL MAYOR DE ELLOS
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-DECLARE
-
-    N1 INT;
-    N2 INT;
-    N3 INT;
-    
-BEGIN
-    N1 := &NUM_1;
-    N2 := &NUM_2;
-    N3 := &NUM_3;
+declare
+   n1 int;
+   n2 int;
+   n3 int;
+begin
+   n1 := &num_1;
+   n2 := &num_2;
+   n3 := &num_3;
 
     -- PREGUNTA 1 (ES MAYOR)
 
-    IF (N1 > N2 AND N1 > N3) THEN
-        DBMS_OUTPUT.PUT_LINE( N1 || ' ES MAYOR');   
-
-    ELSIF (N2 > N1 AND N2 > N3) THEN
-        DBMS_OUTPUT.PUT_LINE( N2 || ' ES MAYOR');    
-
-    ELSE
-        DBMS_OUTPUT.PUT_LINE( N3 || ' ES MAYOR');  
-
-    END IF;
+   if (
+      n1 > n2
+      and n1 > n3
+   ) then
+      dbms_output.put_line(n1 || ' ES MAYOR');
+   elsif (
+      n2 > n1
+      and n2 > n3
+   ) then
+      dbms_output.put_line(n2 || ' ES MAYOR');
+   else
+      dbms_output.put_line(n3 || ' ES MAYOR');
+   end if;
 
     -- PREGUNTA 2 (ES MENOR)
 
-    IF (N1 < N2 AND N1 < N3) THEN
-        DBMS_OUTPUT.PUT_LINE( N1 || ' ES MENOR');   
-
-    ELSIF (N2 < N1 AND N2 < N3) THEN
-        DBMS_OUTPUT.PUT_LINE( N2 || ' ES MENOR');    
-
-    ELSE
-        DBMS_OUTPUT.PUT_LINE( N3 || ' ES MENOR');  
-
-    END IF;
+   if (
+      n1 < n2
+      and n1 < n3
+   ) then
+      dbms_output.put_line(n1 || ' ES MENOR');
+   elsif (
+      n2 < n1
+      and n2 < n3
+   ) then
+      dbms_output.put_line(n2 || ' ES MENOR');
+   else
+      dbms_output.put_line(n3 || ' ES MENOR');
+   end if;
 
     -- PREGUNTA 3 (ES INTERMEDIO)
 
-    IF ((N1 < N2 AND N1 > N3) OR (N1 > N2 AND N1 < N3) ) THEN
-        DBMS_OUTPUT.PUT_LINE( N1 || ' ES INTERMEDIO');   
-
-    ELSIF ((N2 < N1 AND N2 > N3) OR (N2 > N1 AND N2 < N3) ) THEN
-        DBMS_OUTPUT.PUT_LINE( N2 || ' ES INTERMEDIO');
-
-    ELSIF ((N3 < N1 AND N3 > N2) OR (N3 > N1 AND N3 < N2) ) THEN
-        DBMS_OUTPUT.PUT_LINE( N3 || ' ES INTERMEDIO'); 
-
-    ELSE 
-        DBMS_OUTPUT.PUT_LINE( 'HAY ERROR');  
-
-    END IF;
+   if ( (
+      n1 < n2
+      and n1 > n3
+   )
+   or (
+      n1 > n2
+      and n1 < n3
+   ) ) then
+      dbms_output.put_line(n1 || ' ES INTERMEDIO');
+   elsif ( (
+      n2 < n1
+      and n2 > n3
+   )
+   or (
+      n2 > n1
+      and n2 < n3
+   ) ) then
+      dbms_output.put_line(n2 || ' ES INTERMEDIO');
+   elsif ( (
+      n3 < n1
+      and n3 > n2
+   )
+   or (
+      n3 > n1
+      and n3 < n2
+   ) ) then
+      dbms_output.put_line(n3 || ' ES INTERMEDIO');
+   else
+      dbms_output.put_line('HAY ERROR');
+   end if;
     
     -- SE ACABA EL PROGRAMA
 
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA');
-
-END;
-
+   dbms_output.put_line('FIN DE PROGRAMA');
+end;
 
 
-SELECT MAX(2,3,5) FROM DUAL;
+
+select max(2,
+           3,
+           5)
+  from dual;
 
 
 
 
 ----- prueba de ejercicio días del año
 
-DECLARE
-    V_FECHA DATE;
-    V_MES INT;
-    V_DIA INT;
-    V_ANO INT;
-    V_FECHA_FINAL DATE;
-    op_1 int;
-    op_2 int;
-    op_3 int;
-    op_4 int;
-    op_5 int;
-    op_6 int;
-    op_7 int;
-    texto_dia varchar2(50);
-    
+declare
+   v_fecha       date;
+   v_mes         int;
+   v_dia         int;
+   v_ano         int;
+   v_fecha_final date;
+   op_1          int;
+   op_2          int;
+   op_3          int;
+   op_4          int;
+   op_5          int;
+   op_6          int;
+   op_7          int;
+   texto_dia     varchar2(50);
+begin
+   v_fecha := to_date ( '22/06/1983','DD/MM/YYYY' );
+   v_dia := to_number ( to_char(
+      v_fecha,
+      'DD'
+   ) );
+   v_mes := to_number ( to_char(
+      v_fecha,
+      'MM'
+   ) );
+   v_ano := to_number ( to_char(
+      v_fecha,
+      'YY'
+   ) );
+   if ( v_mes = 13 ) then
+      v_ano := ( v_ano + 1 );
+      v_mes := 1;
+   elsif ( v_mes = 14 ) then
+      v_ano := ( v_ano + 1 );
+      v_mes := 2;
+   end if;
 
-    BEGIN
-
-    V_FECHA := TO_DATE('22/06/1983', 'DD/MM/YYYY');
-    V_DIA := TO_NUMBER(TO_CHAR(V_FECHA, 'DD'));
-    V_MES := TO_NUMBER(TO_CHAR(V_FECHA, 'MM'));
-    V_ANO := TO_NUMBER(TO_CHAR(V_FECHA, 'YY'));
-
-    IF (V_MES = 13) THEN
-        V_ANO := (V_ANO +1);
-        V_MES := 1;
-
-    ELSIF (V_MES = 14) THEN
-        V_ANO := (V_ANO +1);
-        V_MES := 2;
-    END if;
-
-    V_FECHA_FINAL := to_date ( v_ano || '-' || v_mes || '-' || v_dia,'YYYY-MM-DD' );
-    op_1 := ((V_MES +1)*3)/5;
-    op_2 := V_ANO/4;
-    op_3 := V_ANO/100;
-    op_4 := V_ANO/400;
-    op_5 := V_DIA + (v_MES * 2) + V_ANO + op_1 + op_2 - op_3 + op_4 +2;
-    op_6 := op_5/7;
-    op_7 := (op_5 - (op_6 * 7))+1;
-
-    if (op_7=0) THEN
-        texto_dia := 'Sábado';
-    elsif (op_7=1) THEN
-        texto_dia := 'Domingo';
-    elsif (op_7 = 2) THEN
-        texto_dia := 'Lunes';
-    elsif (op_7 =3) THEN
-        texto_dia := 'Martes';
-    elsif (op_7 = 4) THEN
-        texto_dia := 'Miércoles';
-    elsif (op_7 = 5) THEN
-        texto_dia := 'Jueves';
-    elsif (op_7 = 6) THEN
-        texto_dia := 'viernes';
-
-    end if;
+   v_fecha_final := to_date ( v_ano
+                              || '-'
+                              || v_mes
+                              || '-'
+                              || v_dia,'YYYY-MM-DD' );
+   op_1 := ( ( v_mes + 1 ) * 3 ) / 5;
+   op_2 := v_ano / 4;
+   op_3 := v_ano / 100;
+   op_4 := v_ano / 400;
+   op_5 := v_dia + ( v_mes * 2 ) + v_ano + op_1 + op_2 - op_3 + op_4 + 2;
+   op_6 := op_5 / 7;
+   op_7 := ( op_5 - ( op_6 * 7 ) ) + 1;
+   if ( op_7 = 0 ) then
+      texto_dia := 'Sábado';
+   elsif ( op_7 = 1 ) then
+      texto_dia := 'Domingo';
+   elsif ( op_7 = 2 ) then
+      texto_dia := 'Lunes';
+   elsif ( op_7 = 3 ) then
+      texto_dia := 'Martes';
+   elsif ( op_7 = 4 ) then
+      texto_dia := 'Miércoles';
+   elsif ( op_7 = 5 ) then
+      texto_dia := 'Jueves';
+   elsif ( op_7 = 6 ) then
+      texto_dia := 'viernes';
+   end if;
 
 
-    dbms_output.put_line('Inicio DE PROGRAMA ' || V_FECHA);
-    dbms_output.put_line('FIN DE PROGRAMA ' || V_FECHA_FINAL);
-
-    dbms_output.put_line('EL día es: ' || to_char(v_fecha_final, 'day'));
-    dbms_output.put_line('Del mes: ' || to_char(v_fecha_final, 'month'));
-    dbms_output.put_line('Del año: ' || to_char(v_fecha_final, 'year'));
-    dbms_output.put_line('El día final es: ' || texto_dia);
-
-END;
+   dbms_output.put_line('Inicio DE PROGRAMA ' || v_fecha);
+   dbms_output.put_line('FIN DE PROGRAMA ' || v_fecha_final);
+   dbms_output.put_line('EL día es: ' || to_char(
+      v_fecha_final,
+      'day'
+   ));
+   dbms_output.put_line('Del mes: ' || to_char(
+      v_fecha_final,
+      'month'
+   ));
+   dbms_output.put_line('Del año: ' || to_char(
+      v_fecha_final,
+      'year'
+   ));
+   dbms_output.put_line('El día final es: ' || texto_dia);
+end;
 
 
 undefine fecha;
@@ -583,112 +653,109 @@ undefine fecha;
 --- ejercicio 2 calcular salario
 
 declare
-N_horas int;
-P_horas int;
-Distancia int;
-pago_total int;
-h_extra int;
-dieta int;
-
+   n_horas    int;
+   p_horas    int;
+   distancia  int;
+   pago_total int;
+   h_extra    int;
+   dieta      int;
 begin
+   n_horas := 40;
+   p_horas := 10;
+   distancia := 400;
+   pago_total := n_horas * p_horas;
+   if ( n_horas > 36 ) then
+      h_extra := n_horas - 36;
+      dbms_output.put_line('Tiene horas extra');
+      dbms_output.put_line('Total horas extra:' || h_extra);
+   else
+      h_extra := 0;
+   end if;
 
-N_horas :=  40;
-P_horas := 10;
-Distancia := 400;
+   if ( distancia < 100 ) then
+      dieta := 0;
+   elsif (
+      distancia > 100
+      and distancia < 250
+   ) then
+      dieta := 200;
+   elsif (
+      distancia > 251
+      and distancia < 500
+   ) then
+      dieta := 400;
+   elsif ( distancia > 501 ) then
+      dieta := 0;
+   end if;
 
-pago_total := N_horas * P_horas;
-
-if (N_horas > 36) then
-    h_extra := N_horas - 36;
-    dbms_output.put_line('Tiene horas extra');
-    dbms_output.put_line('Total horas extra:' || h_extra);
-else 
-    h_extra := 0;
-end if;
-
-if (distancia < 100) then
-    dieta := 0;
-elsif (distancia > 100 and distancia < 250) then
-    dieta := 200;
-elsif (distancia > 251 and distancia < 500) then
-    dieta := 400;
-elsif (distancia > 501) then
-    dieta := 0;
-end if;
-
-pago_total := pago_total + (h_extra * 2) + dieta;
-
-dbms_output.put_line('Dietas provinciales: €' || dieta);
-DBMS_OUTPUT.PUT_LINE('El pago total es de: €' || pago_total);
-
-
+   pago_total := pago_total + ( h_extra * 2 ) + dieta;
+   dbms_output.put_line('Dietas provinciales: €' || dieta);
+   dbms_output.put_line('El pago total es de: €' || pago_total);
 end; 
 
 -- Prueba 3
 
 declare
-
-dni int;
-resultado int;
-letra varchar2(1);
-
+   dni       int;
+   resultado int;
+   letra     varchar2(1);
 begin
-    dni := 12345678;
+   dni := 12345678;
+   resultado := ( round(dni / 23) * 23 ) - dni;
+   if ( resultado = 0 ) then
+      letra := 'T';
+   elsif ( resultado = 1 ) then
+      letra := 'R';
+   elsif ( resultado = 2 ) then
+      letra := 'W';
+   elsif ( resultado = 3 ) then
+      letra := 'A';
+   elsif ( resultado = 4 ) then
+      letra := 'G';
+   elsif ( resultado = 5 ) then
+      letra := 'M';
+   elsif ( resultado = 6 ) then
+      letra := 'Y';
+   elsif ( resultado = 7 ) then
+      letra := 'F';
+   elsif ( resultado = 8 ) then
+      letra := 'P';
+   elsif ( resultado = 9 ) then
+      letra := 'D';
+   elsif ( resultado = 10 ) then
+      letra := 'X';
+   elsif ( resultado = 11 ) then
+      letra := 'B';
+   elsif ( resultado = 12 ) then
+      letra := 'N';
+   elsif ( resultado = 13 ) then
+      letra := 'J';
+   elsif ( resultado = 14 ) then
+      letra := 'Z';
+   elsif ( resultado = 15 ) then
+      letra := 'S';
+   elsif ( resultado = 16 ) then
+      letra := 'Q';
+   elsif ( resultado = 17 ) then
+      letra := 'V';
+   elsif ( resultado = 18 ) then
+      letra := 'H';
+   elsif ( resultado = 19 ) then
+      letra := 'L';
+   elsif ( resultado = 20 ) then
+      letra := 'C';
+   elsif ( resultado = 21 ) then
+      letra := 'K';
+   elsif ( resultado = 22 ) then
+      letra := 'E';
+   elsif ( resultado = 23 ) then
+      letra := 'T';
+   end if;
 
-    resultado:=  (round(dni/23)*23) - dni;
-
-    if (resultado = 0) THEN
-        letra := 'T';
-    elsif (resultado = 1) THEN
-        letra := 'R';
-    elsif (resultado = 2) THEN
-        letra := 'W';
-    elsif (resultado = 3) THEN
-        letra := 'A';
-    elsif (resultado = 4) THEN
-        letra := 'G';
-    elsif (resultado = 5) THEN
-        letra := 'M';
-    elsif (resultado = 6) THEN
-        letra := 'Y';
-    elsif (resultado = 7) THEN
-        letra := 'F';        
-    elsif (resultado = 8) THEN
-        letra := 'P';
-    elsif (resultado = 9) THEN
-        letra := 'D';
-    elsif (resultado = 10) THEN
-        letra := 'X';
-    elsif (resultado = 11) THEN
-        letra := 'B';
-    elsif (resultado = 12) THEN
-        letra := 'N';
-    elsif (resultado = 13) THEN
-        letra := 'J';
-    elsif (resultado = 14) THEN
-        letra := 'Z';
-    elsif (resultado = 15) THEN
-        letra := 'S';
-    elsif (resultado = 16) THEN
-        letra := 'Q';
-    elsif (resultado = 17) THEN
-        letra := 'V';
-    elsif (resultado = 18) THEN
-        letra := 'H';
-    elsif (resultado = 19) THEN
-        letra := 'L';
-    elsif (resultado = 20) THEN
-        letra := 'C';
-    elsif (resultado = 21) THEN
-        letra := 'K';
-    elsif (resultado = 22) THEN
-        letra := 'E';
-    elsif (resultado = 23) THEN
-        letra := 'T';
-    end if;
-
-    dbms_output.put_line('la letra del dni ' || dni || ' es: ' || letra);
-
+   dbms_output.put_line('la letra del dni '
+                        || dni
+                        || ' es: '
+                        || letra);
 end;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /*
@@ -711,64 +778,51 @@ BÚCLES FOR (SON NÚMERICOS DONDE INDICO DONDE EMPIEA Y DONDE CIERRA, NO ES NECE
 -- SUMA DE LOS PRIMEROS 100 NÚMEROS
 -- EN DECLARE SE DEBE INICIAR I, SINO SERÁ NULL
 
-DECLARE
-    i INT;
-    SUMA INT;
+declare
+   i    int;
+   suma int;
+begin
+   i := 1;
+   suma := 0;
+   loop
+      suma := suma + i;
+      i := i + 1;
+      exit when i = 101;
+   end loop;
 
-BEGIN
-    i := 1;
-    suma := 0;
-    
-    LOOP
-
-        SUMA := SUMA +i;
-        i := i+1;
-        EXIT WHEN i = 101;
-
-    END LOOP;
-    
-    dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
-
-END;
+   dbms_output.put_line('a suma dee los primeros 100 números es: ' || suma);
+end;
 
 -- SINTAXÍS USANDO EL WHILE
 -- LA CONDICIÓN SE EVALÚA ANTES DE ENTRAR
 
-DECLARE
-    i int := 1;
-    SUMA INT := 0;
+declare
+   i    int := 1;
+   suma int := 0;
+begin
+   while i <= 100 loop
+      suma := suma + i;
+      i := 1 + i;
+   end loop;
 
-BEGIN
-    WHILE i <= 100 LOOP
-        SUMA := SUMA + i;
-        I := 1+I;
-
-    END LOOP;
-
-    dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
-
-END;
+   dbms_output.put_line('a suma dee los primeros 100 números es: ' || suma);
+end;
 
 -- CONDICIONAL FOOR LOOP
 -- SUELE SER EL MÁS UTILIZADO
 -- SABEMOS EL INICIO Y EL FINAL
 
-DECLARE
-    SUMA INT;
+declare
+   suma int;
+begin
+   suma := 0;
+   for i in 1..100 loop
+      suma := suma + i;
+      dbms_output.put_line('a suma dee los primeros 100 números es: ' || suma);
+   end loop;
 
-BEGIN
-    SUMA := 0;
-
-    FOR I IN 1.. 100 LOOP
-
-        SUMA := SUMA +I;
-        dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
-       
-    END LOOP;
-
-     dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
-
-END;
+   dbms_output.put_line('a suma dee los primeros 100 números es: ' || suma);
+end;
 
 -- ETIQUETA GO TO
 -- SE SALTA BLOQUES DEL CÓDIGO Y SE MENCIONA DONDE DEBERÍA REAPARCER
@@ -776,83 +830,62 @@ END;
 -- LA ETIQUETA DEBE ESTAR SIEMPRE PARA ABAJO, OEA EN EL BEGIN
 -- NO PUEDE ESTAR ANTES DEL IF O EN MITAD DEL LOOP
 
-DECLARE
-    SUMA INT;
-
-BEGIN
-    SUMA := 0;
-    dbms_output.put_line('INICIO');
-    GOTO CODIGO;
-    dbms_output.put_line('ANTES DEL BÚCLE');
-
-    FOR I IN 1.. 100 LOOP
-
-        SUMA := SUMA +I;
-       
-    END LOOP;
-    << CODIGO >>
-    dbms_output.put_line('DESUPUÉS DEL BÚCLE');
-     dbms_output.put_line('a suma dee los primeros 100 números es: '|| SUMA);
-
-END;
+declare
+   suma int;
+begin
+   suma := 0;
+   dbms_output.put_line('INICIO');
+   goto codigo;
+   dbms_output.put_line('ANTES DEL BÚCLE');
+   for i in 1..100 loop
+      suma := suma + i;
+   end loop;
+   << codigo >> dbms_output.put_line('DESUPUÉS DEL BÚCLE');
+   dbms_output.put_line('a suma dee los primeros 100 números es: ' || suma);
+end;
 
 -- EJEMPLOSS
 
 -- UN BÚCLE PARA MOSTRAR LOS NÚMERO ENTRE 1 Y 10 
 -- CON UN BÚCLE WHILE Y FOR
 
-DECLARE
-    I INT := 0;
-    
-BEGIN
-    WHILE I < 11 LOOP
-        I:= I+1;
-        dbms_output.put_line('EL NÚMERO ES:'|| I );
-    
-    END LOOP;
-    dbms_output.put_line('FINAL DE PROCESO');
-
-END;
+declare
+   i int := 0;
+begin
+   while i < 11 loop
+      i := i + 1;
+      dbms_output.put_line('EL NÚMERO ES:' || i);
+   end loop;
+   dbms_output.put_line('FINAL DE PROCESO');
+end;
 
 -- EJERCICIO LOOP FOR
 
-DECLARE
-   
-BEGIN
-
-    FOR I IN 1..10 LOOP
-        dbms_output.put_line('EL NÚMERO ES:'|| I );
-    
-    END LOOP;
-
-END;
+declare begin
+   for i in 1..10 loop
+      dbms_output.put_line('EL NÚMERO ES:' || i);
+   end loop;
+end;
 
 -- PEDIR AL USUARIO UN NÙMERO INICIAL Y OTRO FINAL
 -- MOSTRAR LOS NÚMEROS QUE HAY ENTRE EL RANGO 
 -- SE LE PUEDE AGREGAR UN IF PARA MEJORAR LA CALIDAD
 
-DECLARE
+declare
+   n_inicial int;
+   n_final   int;
+begin
+   n_inicial := &num1;
+   n_final := &num2;
+   if ( n_inicial >= n_final ) then
+      dbms_output.put_line('EL NÚMERO INICIAL DEBE SER MAYOR AL FINAL');
+   else
+      for i in n_inicial..n_final loop
+         dbms_output.put_line('EL NÚMERO ES:' || i);
+      end loop;
+   end if;
 
-    N_INICIAL INT;
-    N_FINAL INT;
-
-BEGIN
-    N_INICIAL := &NUM1;
-    N_FINAL := &NUM2;
-
-    IF (N_INICIAL >= N_FINAL) THEN
-
-         dbms_output.put_line('EL NÚMERO INICIAL DEBE SER MAYOR AL FINAL');
-
-    ELSE 
-
-        FOR I IN N_INICIAL .. N_FINAL LOOP
-            dbms_output.put_line('EL NÚMERO ES:'|| I );
-        END LOOP;
-
-    END IF;
-
-END;
+end;
 
 UNDEFINE NUM1;
 UNDEFINE NUM2;
@@ -861,136 +894,129 @@ UNDEFINE NUM2;
 -- UN BÚCLE CON UN INICIO Y UN FIN. MOSTRAR LOS PARES QUE HAY ENTRE EL INICIO Y EL FIN
 
 
-DECLARE
+declare
+   n_inicial int;
+   n_final   int;
+   resultado int := 0;
+begin
+   n_inicial := &num1;
+   n_final := &num2;
+   for i in n_inicial..n_final loop
+      resultado := mod(
+         i,
+         2
+      );
+      if ( resultado = 0 ) then
+         dbms_output.put_line('ES PAR EL NÚMERO: ' || i);
+      end if;
 
-    N_INICIAL INT;
-    N_FINAL INT;
-    RESULTADO INT := 0;
+   end loop;
 
-BEGIN
-    N_INICIAL := &NUM1;
-    N_FINAL := &NUM2;
-
-    FOR I IN N_INICIAL .. N_FINAL LOOP
-
-        RESULTADO := MOD(I,2);
-
-        IF (RESULTADO = 0) THEN
-        dbms_output.put_line('ES PAR EL NÚMERO: '|| I  );
-
-        END IF;
-   
-    END LOOP;
-
-    dbms_output.put_line('FINAL DEL PROGRAMA'); 
-END;
+   dbms_output.put_line('FINAL DEL PROGRAMA');
+end;
 
 -- CUALQUIER NÚMERO SIEMPRE LLEGARÀ A SER 1 SIGUIENDO UNA SERIE DE INSTRUCCIONES
 -- SI EL NÚMERO ES PAR SE DIVIDE ENTRE 2
 -- SI ES IMPAR SE MÙLTIPLICA POR 3 Y SE SUMA 1
 
 
-DECLARE
-    INICIO INT := &V_INICIO;
-    I INT := 0;
+declare
+   inicio int := &v_inicio;
+   i      int := 0;
+begin
+   loop
+      if ( mod(
+         inicio,
+         2
+      ) = 0 ) then
+         inicio := inicio / 2;
+         dbms_output.put_line(inicio);
+         i := i + 1;
+      else
+         inicio := ( inicio * 3 ) + 1;
+         dbms_output.put_line(inicio);
+         i := i + 1;
+      end if;
 
-BEGIN
-    LOOP
+      exit when inicio = 1;
+   end loop;
 
-        IF (MOD(INICIO,2) = 0 ) THEN
-            INICIO := INICIO /2;
-            dbms_output.put_line(INICIO );
-            I := I+1;
-
-        ELSE
-            INICIO := (INICIO * 3) +1;
-            dbms_output.put_line(INICIO);
-            I := I+1;
-
-        END IF;
-
-    EXIT WHEN INICIO = 1;
-    END LOOP;
-
-     dbms_output.put_line('EL PROCESO TERMINÓ EN: '|| I || ' ITERACCIONES');
-
-END;
+   dbms_output.put_line('EL PROCESO TERMINÓ EN: '
+                        || i
+                        || ' ITERACCIONES');
+end;
 
 UNDEFINE V_INICIO;
 
 -- Mostrar la tabla de multiplicar de un número que pidamos al usuario
 
 
-DECLARE
-
-    N_USUARIO INT := &V_USUARIO;
-    RESULTADO INT;
-
-BEGIN
-
-    FOR I IN 1..10 LOOP
-        RESULTADO := N_USUARIO * I;
-        dbms_output.put_line(N_USUARIO || ' * '|| I || ' = ' || RESULTADO);
-
-
-    END LOOP;
-
-    dbms_output.put_line('fIN DE PROGRAMA');
+declare
+   n_usuario int := &v_usuario;
+   resultado int;
+begin
+   for i in 1..10 loop
+      resultado := n_usuario * i;
+      dbms_output.put_line(n_usuario
+                           || ' * '
+                           || i
+                           || ' = '
+                           || resultado);
 
 
-END;
+   end loop;
+
+   dbms_output.put_line('fIN DE PROGRAMA');
+end;
 
 UNDEFINE V_USUARIO;
 
 -- DISEÑAR UN PROGRAMA QUE PEDIRÁ UN TEXTO
 -- SE DEBE RECORRER EL TEXTO LETRA A LETRA, MOSTRANDO CADA LETRA DE FORMA INDIVIDUAL
 
-DECLARE
-    V_TEXTO VARCHAR2(50):= '&V_TEXTO';
-    V_LENGHT INT;
-    V_LETRA VARCHAR2(2);
-
-BEGIN
-    V_LENGHT := LENGTH(V_TEXTO);
-
-    FOR I IN 1 .. V_LENGHT LOOP
-        V_LETRA:= SUBSTR(V_TEXTO,I,1);
-        DBMS_OUTPUT.PUT_LINE(V_LETRA);
-
-    END LOOP;
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA, TOTAL LETRAS: '|| V_LENGHT);
-
-END;
+declare
+   v_texto  varchar2(50) := '&V_TEXTO';
+   v_lenght int;
+   v_letra  varchar2(2);
+begin
+   v_lenght := length(v_texto);
+   for i in 1..v_lenght loop
+      v_letra := substr(
+         v_texto,
+         i,
+         1
+      );
+      dbms_output.put_line(v_letra);
+   end loop;
+   dbms_output.put_line('FIN DE PROGRAMA, TOTAL LETRAS: ' || v_lenght);
+end;
 
 -- PROGRAMA DONDE EL USUARIO COLOQUE UN TEXTO NUMÉRICO
 -- MOSTRAR LA SUMA DE TODOS LOS CARACTERÉS NUMÉRICOS EN UN MENAJE
 
 
-DECLARE
-    V_TEXTO VARCHAR2(50):= '&1234';
-    V_NUMERO INT;
-    V_LENGHT INT;
-    N1 INT;
-    V_NUMERO_FIN INT;
+declare
+   v_texto      varchar2(50) := '&1234';
+   v_numero     int;
+   v_lenght     int;
+   n1           int;
+   v_numero_fin int;
+begin
+   v_numero_fin := to_number ( v_texto );
+   v_lenght := length(v_texto) + 1;
+   v_numero := 0;
+   for i in 1..v_lenght loop
+      n1 := to_number ( substr(
+         v_texto,
+         i,
+         1
+      ) );
+      v_numero := v_numero + n1;
+      dbms_output.put_line(v_numero);
+   end loop;
 
-BEGIN
-    V_NUMERO_FIN := TO_NUMBER(V_TEXTO);
-    V_LENGHT := LENGTH(V_TEXTO)+1;
-    V_NUMERO:= 0;
-
-    FOR I IN 1..V_LENGHT LOOP
-
-        N1 := TO_NUMBER(SUBSTR( V_TEXTO,I,1));
-        
-        V_NUMERO := V_NUMERO + N1;
-
-        DBMS_OUTPUT.PUT_LINE(V_NUMERO);
-
-    END LOOP;
-
-    DBMS_OUTPUT.PUT_LINE('FIN DE PROGRAMA, TOTAL LETRAS: '|| V_NUMERO);
-
-END;
+   dbms_output.put_line('FIN DE PROGRAMA, TOTAL LETRAS: ' || v_numero);
+end;
 
 UNDEFIN TEXTO_USUARIO;
 
@@ -1015,75 +1041,82 @@ EXPLÌCITO: TENGO QUE DECLARAR EL CURSO Y EL VALOR IS
 
 -- INSERTAR 5 DEPARTAMENTOS EN UN BLOQUE PL/SQL DINÁMICO A TRAVÉS DE UN BÚCLE
 declare
-
-    V_NOMBRE DEPT.DNOMBRE%TYPE;
-    V_LOC DEPT.LOC%TYPE;
-
+   v_nombre dept.dnombre%type;
+   v_loc    dept.loc%type;
 begin
+   for i in 1..5 loop
+      v_nombre := 'DEPARTAMENTO_' || i;
+      v_loc := 'LOCALIDAD_' || i;
+      insert into dept values ( (
+         select max(dept_no) + 1
+           from dept
+      ),
+                                v_nombre,
+                                v_loc );
 
-    FOR I IN 1..5 LOOP
-        V_NOMBRE := 'DEPARTAMENTO_' || I;
-        V_LOC := 'LOCALIDAD_'|| I;
-        INSERT INTO DEPT VALUES ((SELECT MAX(DEPT_NO)+1 FROM DEPT), V_NOMBRE, V_LOC);
+   end loop;
 
-    END LOOP;
-
-    DBMS_OUTPUT.PUT_LINE('FIN DEL PROGRAMA');
+   dbms_output.put_line('FIN DEL PROGRAMA');
 end;
 
-SELECT * FROM DEPT;
+select *
+  from dept;
 
-ROLLBACK;
+rollback;
 
 -- REALIAR UN BLOQUE QUE PEDIRÁ UN NÚMERO Y MOSTRARÁ EL DEPARTAMENTO CON DICHO NÚMERO
 -- YA QUE SALE SUSTITUCIÓN CANCELADA, LO PONGO COMO 10
 
-DECLARE
-    V_ID INT := 10;
+declare
+   v_id int := 10;
+begin
+   select *
+     from dept
+    where dept_no = v_id;
 
-BEGIN
-    SELECT * FROM DEPT WHERE DEPT_NO = V_ID;
-
-END;
+end;
 
 -- EJEMPLO DE CURSOR IMPLÌCITO, DONDE VOY A RECUPERAR EL OFICIO DEL APELLIDO REY
 
-DECLARE 
-
-    V_OFICIO EMP.OFICIO%TYPE;
-
-
-BEGIN
-    SELECT OFICIO INTO V_OFICIO FROM EMP WHERE UPPER(APELLIDO)= 'REY';
-    DBMS_OUTPUT.PUT_LINE('EL APELLIDO DE REY ES '|| V_OFICIO);
-
-END;
+declare
+   v_oficio emp.oficio%type;
+begin
+   select oficio
+     into v_oficio
+     from emp
+    where upper(apellido) = 'REY';
+   dbms_output.put_line('EL APELLIDO DE REY ES ' || v_oficio);
+end;
 
 -- EJEMPLO DE CURSOR EXPLÌCITO
 -- PUEDE DEVOLVER MÀS DE UNA FILA Y ES NECESARIO DECALRARLOS A TRAVÉS DE LA PALABRA CURSOR
 
-DECLARE
-    V_APE EMP.APELLIDO%TYPE;
-    V_SAL EMP.SALARIO%TYPE;
+declare
+   v_ape emp.apellido%type;
+   v_sal emp.salario%type;
     -- DECLARAMOS CURSOR CON UNA CONSULTA
     -- LA CONSULTA DEBE TENER LOS MISMOS DATOS PARA HACE EL FET (TANTOS EN EL SELECT COMO CON LA DECLARACIÓN)
-    CURSOR CURSOREMP IS 
-    SELECT APELLIDO, SALARIO FROM EMP;
+   cursor cursoremp is
+   select apellido,
+          salario
+     from emp;
 
-BEGIN
+begin
     -- SE ABRE EL CURSOS
-    OPEN CURSOREMP;
-    LOOP
+   open cursoremp;
+   loop
         -- EXTREMOS LOS DATOS DEL CUROSRA TRAVÉS DE FTCH
-        FETCH CURSOREMP INTO V_APE, V_SAL;
-
-        DBMS_OUTPUT.PUT_LINE('APELLIDO: '|| V_APE || ',SALARIO: '|| V_SAL);
-        EXIT WHEN CURSOREMP%NOTFOUND; 
-
-    END LOOP;
-    CLOSE CURSOR;
-
-END;
+      fetch cursoremp into
+         v_ape,
+         v_sal;
+      dbms_output.put_line('APELLIDO: '
+                           || v_ape
+                           || ',SALARIO: '
+                           || v_sal);
+      exit when cursoremp%notfound;
+   end loop;
+   close cursor;
+end;
 
 -- ATRIBUTOSS 
 -- NOTFOUND: SE ACTIVA SI NO HA RECUPERADO NINGUNA FILA EL CURSOR
@@ -1093,12 +1126,13 @@ END;
 -- ATRIBUTOS PARACONSULTA DE ACCIÓN
 
 -- IMCREMENTAR EN 1 EL SALARIO DE LOS EMPLEADOS
-BEGIN 
-    UPDATE EMP SET SALARIO = SALARIO +1
-    WHERE DEPT_NO =10;
-    DBMS_OUTPUT.PUT_LINE('EMPLEADOS: '|| SQL%ROWCOUNT);
-
-END;
+begin
+   update emp
+      set
+      salario = salario + 1
+    where dept_no = 10;
+   dbms_output.put_line('EMPLEADOS: ' || sql%rowcount);
+end;
 
 
 ----
@@ -1106,22 +1140,30 @@ END;
 -- INCREMENTAR EN 10000 AL EMPLEADO QUE MENOS COBRE EN LA EMPRESA
 -- 
 
-SELECT * FROM EMP;
+select *
+  from emp;
 
 
-DECLARE
-
-    V_SALARIO EMP.SALARIO%TYPE;
-    V_APELLIDO EMP.APELLIDO%TYPE;
-
-BEGIN 
-
-    SELECT MIN(SALARIO) INTO V_SALARIO FROM EMP;
-    SELECT APELLIDO INTO V_APELLIDO FROM EMP WHERE SALARIO = V_SALARIO;
-    UPDATE EMP SET SALARIO = SALARIO + 10000 WHERE SALARIO = V_SALARIO;
-    DBMS_OUTPUT.PUT_LINE('SALARIO INCREMENTADO A '|| SQL%ROWCOUNT || ' EMPLEADOS');
-    DBMS_OUTPUT.PUT_LINE('La persona a la que se le subió es '|| V_APELLIDO);
-END;
+declare
+   v_salario  emp.salario%type;
+   v_apellido emp.apellido%type;
+begin
+   select min(salario)
+     into v_salario
+     from emp;
+   select apellido
+     into v_apellido
+     from emp
+    where salario = v_salario;
+   update emp
+      set
+      salario = salario + 10000
+    where salario = v_salario;
+   dbms_output.put_line('SALARIO INCREMENTADO A '
+                        || sql%rowcount
+                        || ' EMPLEADOS');
+   dbms_output.put_line('La persona a la que se le subió es ' || v_apellido);
+end;
 
 
 -- rEALIZAR UN CÓDIGO PL/SQL DONDE SE PEDIRÁ EL NÚMERO, NOMBRE Y LOCALIDAD DE UN DEPARTAMENTO
@@ -1129,42 +1171,50 @@ END;
 -- SI EL DEPARTAMENTO NO EXISTE, LO MODIFICAMOS 
 
 
-SELECT * FROM DEPT;
+select *
+  from dept;
 
 
-DECLARE
+declare
     -- VARIABLES PARA AGREGAR
-    V_DEPT_NO DEPT.DEPT_NO%TYPE;
-    V_DNOMBRE DEPT.DNOMBRE%TYPE;
-    V_LOC DEPT.LOC%TYPE;
-    V_EXISTE DEPT.DEPT_NO%TYPE;
+   v_dept_no dept.dept_no%type;
+   v_dnombre dept.dnombre%type;
+   v_loc     dept.loc%type;
+   v_existe  dept.dept_no%type;
     
     -- APERTURA DEL CURSOR
-    CURSOR CURSORDEPT IS 
-    SELECT DEPT_NO FROM DEPT WHERE DEPT_NO= V_DEPT_NO;
+   cursor cursordept is
+   select dept_no
+     from dept
+    where dept_no = v_dept_no;
 
-BEGIN
+begin
     -- SE ABREN LOS DATOS DEL USUARIO
-    V_DEPT_NO := 10;
-    V_DNOMBRE := 'I+D';
-    V_LOC :=  'GIJON';
+   v_dept_no := 10;
+   v_dnombre := 'I+D';
+   v_loc := 'GIJON';
 
     -- INICIA EL CURSOR /EL FETCH ES OPCIONAL/ 
-    OPEN CURSORDEPT;
-    FETCH CURSORDEPT INTO V_EXISTE;
+   open cursordept;
+   fetch cursordept into v_existe;
+   if cursordept%found then
+      update dept
+         set
+         dnombre = v_dnombre
+       where dept_no = v_dept_no;
+      update dept
+         set
+         loc = v_loc
+       where dept_no = v_dept_no;
+      dbms_output.put_line('UPDATE');
+   else
+      insert into dept values ( v_dept_no,
+                                v_dnombre,
+                                v_loc );
+      dbms_output.put_line('INSERT');
+   end if;
 
-    IF CURSORDEPT%FOUND  THEN
-        UPDATE DEPT SET DNOMBRE = V_DNOMBRE WHERE DEPT_NO = V_DEPT_NO;
-        UPDATE DEPT SET LOC = V_LOC WHERE DEPT_NO = V_DEPT_NO;
-        DBMS_OUTPUT.PUT_LINE('UPDATE');
-
-    else
-        INSERT INTO DEPT VALUES (V_DEPT_NO, V_DNOMBRE, V_LOC); 
-        DBMS_OUTPUT.PUT_LINE('INSERT');
-
-    end if;
-
-END;
+end;
 
 --- count puede ser una opción muy útil que funciona/ incluso sin cursor
 declare
@@ -1191,7 +1241,9 @@ end;
 -- SI EL EMPLEADO COBRA MÁS DE 250.000 SE LE BAJA EL SUELDO EN 10.000
 -- SI NO, SE SUBE EL SUELDO EN 100.000
 
-SELECT * FROM EMP WHERE APELLIDO = 'arroyo';
+select *
+  from emp
+ where apellido = 'arroyo';
 
 
 declare
@@ -1226,9 +1278,11 @@ end;
 -- si la suma salarial no supera el 1.000.000 subimos un millon
 -- mostrar el número de filas que se han modificado
 
-select * from DOCTOR;
+select *
+  from doctor;
 
-SELECT * FROM HOSPITAL;
+select *
+  from hospital;
 
 
 
@@ -1244,7 +1298,7 @@ begin
     inner join hospital
    on doctor.hospital_cod = hospital.hospital_cod
     where lower(hospital.nombre) = 'la paz';
-  
+
    select sum(doctor.salario)
      into v_salario
      from doctor
@@ -1262,7 +1316,7 @@ begin
            from hospital
           where nombre = 'la paz'
       );
-      dbms_output.put_line('DOCTORES MÁS POBRES: ' || SQL%ROWCOUNT);
+      dbms_output.put_line('DOCTORES MÁS POBRES: ' || sql%rowcount);
    else
       update doctor
          set
@@ -1272,12 +1326,12 @@ begin
            from hospital
           where nombre = 'la paz'
       );
-      dbms_output.put_line('DOCTORES CON SUERTE: ' || SQL%ROWCOUNT);
+      dbms_output.put_line('DOCTORES CON SUERTE: ' || sql%rowcount);
    end if;
 
 end;
 
-ROLLBACK;
+rollback;
 
 -- OTRA FORMA
 
@@ -1320,27 +1374,25 @@ end;
 
 declare
    v_suma_salarial doctor.salario%type;
-   v_codigo hospital.hospital_cod%type;
-
+   v_codigo        hospital.hospital_cod%type;
 begin
-    select hospital_cod into v_codigo 
-    from hospital
+   select hospital_cod
+     into v_codigo
+     from hospital
     where lower(nombre) = 'la paz';
-    
+
 
    select sum(doctor.salario)
      into v_suma_salarial
      from doctor
-     where hospital_cod = v_codigo;
+    where hospital_cod = v_codigo;
    dbms_output.put_line('SUMA SALARIAL: ' || v_suma_salarial);
-
    if ( v_suma_salarial > 1000000 ) then
       update doctor
          set
          salario = salario + 10.000
        where hospital_cod = v_codigo;
       dbms_output.put_line('DOCTORES MÁS POBRES: ' || sql%rowcount);
-
    else
       update doctor
          set
@@ -1359,9 +1411,9 @@ describe dept;
 
 
 declare
-    v_id number;
+   v_id number;
 begin
-    dbms_output.put_line('valor variable ' || v_id);
+   dbms_output.put_line('valor variable ' || v_id);
 end;
 
 
@@ -1369,21 +1421,25 @@ end;
 
 -- se puede almacenar todos los departamentos (uno a uno) en un rowtype
 declare
-    v_fila dept%rowtype;
-    cursor cursor_dept is
-    select * from dept;
+   v_fila dept%rowtype;
+   cursor cursor_dept is
+   select *
+     from dept;
 
 begin
-    open cursor_dept;
+   open cursor_dept;
+   loop
+      fetch cursor_dept into v_fila;
+      exit when cursor_dept%notfound;
+      dbms_output.put_line('ID '
+                           || v_fila.dept_no
+                           || ', nombre '
+                           || v_fila.dnombre
+                           || ', localidad '
+                           || v_fila.loc);
+   end loop;
 
-    loop
-        fetch cursor_dept into v_fila;
-        exit when cursor_dept%notfound;
-        dbms_output.put_line('ID ' || v_fila.dept_no||', nombre ' || v_fila.Dnombre || ', localidad '|| v_fila.loc );
-    end loop;
-    
-    close cursor_dept; 
-
+   close cursor_dept;
 end;
 
 -- hay una sintaxis para cuando hay un cursor que sea màs sencillo. no se abre ni se pone el fetch
@@ -1403,3 +1459,289 @@ begin
                            || v_reg_doctor.especialidad);
    end loop;
 end;
+
+select *
+  from emp;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* 
+24 de abril 
+excepciones
+cuando hay error me sale una excepción
+pero puedo hacer algo con ello 
+exception es para declarar las posibles excepciones
+si existe la excepciòn e trata, si no da error
+se tienen que capturar las que yo quiera
+Si el bloque no tiene excpeciòn, se para. Se pone al final, antes del end
+
+puden ser 
+implìcitas: las de Oracle
+Explìcitas: las puedo generar yo mismo. Se debe poner en la zona de declaración y se usa raise
+*/
+
+-- CUANDO LA EXCEPCIÒN YA ESTÁ CREADA
+
+declare
+   v_n1  number := 100;
+   v_n2  number := 0;
+   v_div number;
+begin
+   v_div := v_n1 / v_n2;
+   dbms_output.put_line('LA DIVISIÒN ES ' || v_div);
+exception
+   when zero_divide then
+      dbms_output.put_line('ERROR AL DIVIDIR NTRE 0');
+end;
+
+
+-- CUANDO YO QUIERO CREAR LA EXCEPCIÓN
+-- CUANDO LOS EMPLEADOS TENGAN UNA COMISIÒN CON VALOR DE 0, LANZO UNA EXCEPCIÓN
+-- TENER UNA TABLA CON LOS EMPLEADOS SEAN MAYOR A CERO
+
+select apellido,
+       comision
+  from emp
+ order by comision desc;
+
+create table emp_comision (
+   apellido varchar2(50),
+   comision number(9)
+);
+
+drop table emp_comision;
+
+declare
+   cursor cursor_emp is
+   select apellido,
+          comision
+     from emp
+    order by comision desc;
+    -- DELCARO UNA EXCEPCIÓN
+   exception_comision exception;
+begin
+   for v_record in cursor_emp loop
+      insert into emp_comision values ( v_record.apellido,
+                                        v_record.comision );
+      if ( v_record.comision > 0 ) then
+         raise exception_comision;
+      end if;
+   end loop;
+exception
+   when exception_comision then
+      dbms_output.put_line('COMISIONES A ZERO');
+-- QUIERO DETENER ESTO CUANDO LA COMISIÓN SEA 0
+
+end;
+
+select *
+  from emp_comision;
+-- PRAGMA
+-- ESTÀ LA OPCIÓN PRAGMA EXCEPTION_INIT PARA DEFINIR LO QUE SIGNIFICA EL ERROR
+
+SELECT * FROM DEPT;
+DESCRIBE DEPT;
+
+DELETE FROM DEPT
+WHERE DEPT_NO IS NULL;
+
+ALTER TABLE DEPT
+MODIFY DEPT_NO NOT NULL;
+
+
+declare
+   exception_nulos exception;
+   pragma exception_init ( exception_nulos,-1400 );
+begin
+   insert into dept values ( null,
+                             'DEPARTAMENTO',
+                             'PRAGMA' );
+EXCEPTION
+    WHEN exception_nulos THEN
+        DBMS_OUTPUT.PUT_LINE('NO ME SIRVEN LOS NULOS');
+end;
+
+ROLLBACK;
+
+
+--- opción others
+
+select * from dept; 
+
+DECLARE
+    v_id number;
+
+BEGIN
+    SELECT DEPT_NO INTO V_ID
+    FROM DEPT
+    WHERE DNOMBRE = 'sevilla';
+    DBMS_OUTPUT.PUT_LINE('VENTAS ES EL NÚMERO' || V_ID);
+
+EXCEPTION
+    when too_many_rows then
+        DBMS_OUTPUT.PUT_LINE('demasiada fila en cursor');
+    when others then
+        DBMS_OUTPUT.PUT_LINE('algo está pasando');
+        DBMS_OUTPUT.PUT_LINE(to_char(sqlcode)||'  '||sqlerrm);
+
+END;
+
+-- raise_application error
+-- puedo mandar mensajes de error donde me dice el mensaje y el número
+-- tiene que ser rangos entre 20.000 y 20.900 
+
+select * from dept; 
+
+DECLARE
+    v_id number;
+
+BEGIN
+    raise_application_error(-20001, 'puedo hacer esto con esta exepción?');
+    SELECT DEPT_NO INTO V_ID
+    FROM DEPT
+    WHERE DNOMBRE = 'sevilla';
+    DBMS_OUTPUT.PUT_LINE('VENTAS ES EL NÚMERO' || V_ID);
+END;
+
+-- IMPORTANTE: PROCEDIMIENTOS ALMACENADOS
+-- hasta el momento  SE PERDÌAN LOS BLOQUES ANÓNIMOS 
+-- SE ALMACENA LO QUE SE QUIERA EN UN OBJETO PERSISTENTE EN UNA BASE DE DATOS
+-- ES PARECIDO A LAS FUNCIONES//
+-- NO SE PUED UTILIZAR LAS FUNCIONES CREATE, ALTER Y DROP
+-- EL CREAR UN PROCEDIMIENTO NO IMPLICA QUE SE HAYA CREADO BIEN
+-- SE DEBE LLAMAR EN UN BLOQUE ANÓNIMO
+
+CREATE OR REPLACE PROCEDURE SP_MENSAJE
+AS 
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('HOLA MUNDO');
+END;
+
+-- PARA LLAMAR AL PROCEDIMIENTO
+
+BEGIN
+    SP_MENSAJE;
+END;
+
+-- PROCEDIMENTO CON BLOQUE PLSQL
+
+create or replace procedure sp_ejmeplo_plsql as
+begin
+   declare
+      v_numero int := 24;
+   begin
+      if v_numero > 0 then
+         dbms_output.put_line('POSITIVO');
+      else
+         dbms_output.put_line('NEGATIVO');
+      end if;
+
+   end;
+end;
+
+-- LLAMADA DE LOS DATOS
+begin
+   sp_ejmeplo_plsql;
+end;
+
+-- TENEMOS OTRA SINTAXIS PARA TENER VARIABLES DENTRO DE UN PROCEDIMIENTO
+-- NO SE UTILIZA EL DECLARE DENTRO DEL PROCEDIMIENTO
+
+CREATE OR REPLACE PROCEDURE sp_ejmeplo_plsql2
+AS
+    V_NUMERO NUMBER := 8;
+BEGIN
+          if v_numero > 0 then
+         dbms_output.put_line('POSITIVO');
+      else
+         dbms_output.put_line('NEGATIVO');
+      end if;
+END;
+
+begin
+   sp_ejmeplo_plsql2;
+end;
+
+
+--- PROCEDIMIENTO DINÀMICOS
+-- VAN DECLARADOS ANTES DEL (AS O IS)
+-- ES MEJOR SEPARAR LAS VARIABLES TIPO V_... Y LOS PARÁMETROS P_...
+
+
+CREATE OR REPLACE PROCEDURE sp_EJEMPLO_IF
+(P_1 NUMBER)
+IS
+    V_NUMERO NUMBER := P_1;
+BEGIN
+          if v_numero > 0 then
+         dbms_output.put_line('POSITIVO');
+      else
+         dbms_output.put_line('NEGATIVO');
+      end if;
+END;
+
+
+begin
+   sp_ejmeplo_plsql2;
+end;
+
+-- EJEMPLO CON SUMA
+
+CREATE OR REPLACE PROCEDURE sp_SUMA
+(P_1 NUMBER, P_2 NUMBER)
+as
+    V_SUMA NUMBER;
+
+BEGIN
+    V_SUMA:= P_1 + P_2;
+    dbms_output.put_line('LA SUMA DE LOS NÚMEROS ES ' || V_SUMA);
+END;
+
+-- LOS PARÁMETROS SE SUMAN EN EL MISMO ORDEN QUE ESTÀN LLAMADOS
+
+BEGIN
+    SP_SUMA (5,6);
+END;
+
+
+CREATE OR REPLACE PROCEDURE SP_DIVIDIR_NUMEROS
+(P1 NUMBER, P2 NUMBER)
+AS
+    V_DIV NUMBER;
+BEGIN
+    V_DIV := P1/ P2;
+    dbms_output.put_line('LA DIVISIÓN DE LOS NÚMEROS ES ' || V_DIV);
+EXCEPTION
+    WHEN ZERO_DIVIDE THEN
+        dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE');
+END;
+
+BEGIN
+    SP_DIVIDIR_NUMEROS (10,0);
+EXCEPTION
+    WHEN ZERO_DIVIDE THEN
+    dbms_output.put_line('DIVISIÒN PL/SQL OUTER 3');
+END;
+
+--- AGREGAR PROCEDURE DENTRO DE OTRO
+
+CREATE OR REPLACE PROCEDURE SP_DIVIDIR_NUMEROS
+(P1 NUMBER, P2 NUMBER)
+AS
+    
+BEGIN
+    declare
+        V_DIV NUMBER;
+    begin
+        V_DIV := P1/ P2;
+        dbms_output.put_line('LA DIVISIÓN DE LOS NÚMEROS ES ' || V_DIV);
+    exception
+        WHEN ZERO_DIVIDE THEN
+            dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE  1');
+
+    end;
+   
+EXCEPTION
+    WHEN ZERO_DIVIDE THEN
+        dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE  2');
+END;

@@ -1724,24 +1724,51 @@ EXCEPTION
 END;
 
 --- AGREGAR PROCEDURE DENTRO DE OTRO
+create or replace procedure sp_dividir_numeros (
+   p1 number,
+   p2 number
+) as
+begin
+   declare
+      v_div number;
+   begin
+      v_div := p1 / p2;
+      dbms_output.put_line('LA DIVISIÓN DE LOS NÚMEROS ES ' || v_div);
+   exception
+      when zero_divide then
+         dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE  1');
+   end;
+exception
+   when zero_divide then
+      dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE  2');
+end;
+--el excepcion màs cercano a la condición
 
-CREATE OR REPLACE PROCEDURE SP_DIVIDIR_NUMEROS
-(P1 NUMBER, P2 NUMBER)
-AS
-    
-BEGIN
-    declare
-        V_DIV NUMBER;
-    begin
-        V_DIV := P1/ P2;
-        dbms_output.put_line('LA DIVISIÓN DE LOS NÚMEROS ES ' || V_DIV);
-    exception
-        WHEN ZERO_DIVIDE THEN
-            dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE  1');
+-- en los procedimiento no se puede agregar o limitar las condiciones. La idea es usar columna.type 
+-- crear un procedimiento para ingrar un departamento
+-- normalmente en los procedimientos de acciòn se incluye commit o rollback si se diera una excepciòn
 
-    end;
-   
-EXCEPTION
-    WHEN ZERO_DIVIDE THEN
-        dbms_output.put_line('DIVISIÓN ENTRE CERO PROCEDURE  2');
-END;
+select * from dept;
+create or replace procedure sp_instdept (
+   p_id        dept.dept_no%type,
+   p_nombre    dept.dnombre%type,
+   p_localidad dept.loc%type
+) as
+begin
+   insert into dept values ( p_id,
+                             p_nombre,
+                             p_localidad );
+end;
+
+-- version mejorada /se agrega el max para que automàticamente lo agregue
+
+create or replace procedure sp_instdept (
+   p_id        dept.dept_no%type,
+   p_nombre    dept.dnombre%type,
+   p_localidad dept.loc%type
+) as
+begin
+   insert into dept values ( p_id,
+                             p_nombre,
+                             p_localidad );
+end;

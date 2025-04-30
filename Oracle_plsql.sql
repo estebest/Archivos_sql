@@ -1763,12 +1763,184 @@ end;
 -- version mejorada /se agrega el max para que automàticamente lo agregue
 
 create or replace procedure sp_instdept (
-   p_id        dept.dept_no%type,
+   --p_id        dept.dept_no%type,
    p_nombre    dept.dnombre%type,
    p_localidad dept.loc%type
-) as
+) 
+as
+   v_max_id dept.dept_no%type;
 begin
-   insert into dept values ( p_id,
+   -- realizamos el cursor implìcito para buscar el max id
+   select max(dept_no) +10 into v_max_id from dept;
+   insert into dept values ( v_max_id,
                              p_nombre,
                              p_localidad );
+   commit;
+exception
+   when no_data_found then
+   dbms_output.put_line('No existen datos');
+   rollback;
 end;
+
+-- llamada al procedimiento
+begin
+   sp_instdept ( 'martes', 'jueves');
+end;
+
+select * from dept;
+select * from emp; 
+-- aumentar los empleados por un oficio, debemos enviar el oficio y el incremento 
+
+create or replace procedure sp_aumento_salario
+   (p_oficio emp.oficio%type,
+   P_salario_aumento emp.salario%type)
+as
+begin
+   update emp set salario = salario + P_salario_aumento where upper (oficio)
+   = upper(p_oficio); 
+end;
+
+begin
+   sp_aumento_salario ('Director',1);
+end;
+
+-- Insertar un doctor, e envìan todos los datos del doctor.
+-- RECUPERAR EL MAX ID DEL PROCEDIMIENTO 
+
+select * from doctor;
+
+describe doctor;
+
+select * from hospital;
+
+create or replace procedure sp_insertar_doctor (
+   p_nombre       doctor.apellido%type,
+   p_especialidad doctor.especialidad%type,
+   p_salario      doctor.salario%type,
+   p_hospital     hospital.hospital_cod%type
+) as
+   v_doctor_no doctor.doctor_no%type;
+begin
+   select max(doctor_no) + 1
+     into v_doctor_no
+     from doctor;
+
+   insert into doctor values ( p_hospital,
+                               v_doctor_no,
+                               p_nombre,
+                               p_especialidad,
+                               p_salario );
+   dbms_output.put_line('Número de filas insertadas' || sql%rowcount);
+   commit;
+end;
+
+-- enviamos el nombre del hospital en vez del id del hospital
+-- enviar el nombre del hospital en vz del id del hopital
+
+select * from hospital ;
+
+create or replace procedure sp_insertar_doctor (
+   p_nombre       doctor.apellido%type,
+   p_especialidad doctor.especialidad%type,
+   p_salario      doctor.salario%type,
+   p_hospital     hospital.nombre%type
+) as
+   v_doctor_no doctor.doctor_no%type;
+   v_hopital_cod hospital.HOSPITAL_COD%TYPE;
+
+begin
+
+   select hospital_cod into v_hopital_cod from hospital ; 
+
+   select max(doctor_no) + 1 into v_doctor_no from doctor;
+
+   insert into doctor values ( p_hospital,
+                               v_doctor_no,
+                               p_nombre,
+                               p_especialidad,
+                               p_salario );
+   commit;
+   dbms_output.put_line('Número de filas insertadas' || sql%rowcount);
+
+   exception
+   when no_data_found then
+   dbms_output.put_line('No existen datos');
+
+end;
+
+
+begin
+   sp_insertar_doctor ('prueba 1','prueba', 100,'la paz');
+end;
+
+-- podemo utilizar cursores explìcitos dentro de los procedimientos 
+-- motrar los empleados de determinado nùmeros de departamentos
+
+create or replace procedure sp_dempleados_dept
+(p_deptno emp.dept_no%type)
+as
+
+   cursor cursor_emp is
+   select * from emp
+   where dept_no = p_deptno; 
+
+begin
+
+   for v_reg_emp in cursor_emp
+   loop
+      dbms_output.put_line('aplleido: ' || v_reg_emp.apellido ||', oficio: '|| v_reg_emp.oficio);
+   end loop;
+
+end;
+
+begin
+   sp_dempleados_dept(10);
+end;
+
+-- los paràmtros son obligaorios. Aunque está la opción de hacer parametros opcionales. Estos valores tienen un valor por defecto aunque si yo ls doy valor, s e los doy. 
+
+
+-- Procedimientos almacenados con parámetros de salida
+-- Los procedimientoss pueden modificar su valor i tienen un parámetro de salida. Hata el momento no se podría modificar. 
+-- Sirve mucho paa conectar con otros lenguajes. se guarda la variable para que la pueda usar en muchos otros sitios
+
+-- enviar el nombre del departamento y devolver su número
+-- la herramienta de uno, me sirve para comunicar y enviar entre otros.
+
+create or replace procedure sp_numerodeparamento
+(p_nombre dept.dnombre%type, p_iddept out dept.dept_no%type  )
+as
+   v_iddept dept.DEPT_NO%TYPE;
+
+begin
+   select dept_no into v_iddept from dept where upper (dnombre) = upper (p_nombre);
+   p_iddept := v_iddept;
+   dbms_output.put_line('el numero de departamento es'|| v_iddept );
+end;
+
+begin
+   sp_numerodeparamento('ventas');
+end;
+
+--- un procedimiento para incrementar el salario de 1 departamento
+-- se envìa al procedimiento el nombre del departamento 
+---
+create procedure sp_incrementar_sal_dept
+(p_nombre dept.dnombre%type)
+
+as
+   V_num dept.dept_no%type;
+
+begin
+
+   -- lamamos al procedimiento de nùmero para recuerarlo a partir del nombre
+   sp_numerodeparamento(p_nombre, v_num);
+   update emp set salario = salario +1 where dept_no=v_num ;
+   dbms_output.put_line('salario modificado '|| sql%rowcount );
+end;
+
+--
+begin 
+ sp_incrementar_sal_dept ('ventas');
+end;
+

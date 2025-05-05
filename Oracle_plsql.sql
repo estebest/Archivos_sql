@@ -875,8 +875,8 @@ declare
    n_inicial int;
    n_final   int;
 begin
-   n_inicial := &num1;
-   n_final := &num2;
+   n_inicial := 1;
+   n_final := 10;
    if ( n_inicial >= n_final ) then
       dbms_output.put_line('EL NÚMERO INICIAL DEBE SER MAYOR AL FINAL');
    else
@@ -1942,5 +1942,220 @@ end;
 --
 begin 
  sp_incrementar_sal_dept ('ventas');
+end;
+
+/* 
+
+05 d mayo de 2025
+
+FUNCIONES
+similar a procedimientos. Es algo que se tiene pero permite devolver un valor a una llamada
+Un funciòn siempre devuelve un valor.
+Siempre debe tener return
+
+*/
+-- ejemplo función para sumar dos números
+
+create or replace function f_sumarnumeros
+(p_1 number, P_2 number)
+return number
+as
+   v_suma number;
+begin
+   v_suma := nvl(p_1,0) + nvl(P_2,0);
+   -- siempre return
+   return v_suma;
+end;
+
+-- llamada con código pl/sql
+
+declare
+   v_resultado number;
+begin
+   V_RESULTADO := f_sumarnumeros (100,2000);
+   DBMS_OUTPUT.PUT_LINE('La suma es ' || v_resultado);
+end;
+
+-- llamada desde select
+
+select f_sumarnumeros(5,8) as suma from dual;
+
+select apellido, f_sumarnumeros(salario, comision) as total from emp;
+
+-- crear una función para aber el nùmero de persona de un oficio
+create or replace function f_num_per_oficio
+(p_oficio emp.oficio%type)
+return number
+
+as
+   v_personas int;
+
+begin
+   select count(emp_no) into v_personas from emp
+   where lower(oficio) = p_oficio;
+   return v_personas;
+   
+end; 
+
+DECLARE
+   v_resultado int;
+begin
+   v_resultado := f_num_per_oficio('analista');
+   DBMS_OUTPUT.PUT_LINE('La cuena otal es es ' || v_resultado);
+   
+end;
+
+create or replace function F_mayor_menor
+(p1 number, p2 number)
+return number
+
+as
+   v_mayor number;
+begin
+   if p1 > P2 then
+      v_mayor := p1;
+   elsif p2 > p1  then
+      v_mayor := p2;
+   else
+      v_mayor := 0;
+   end if;
+
+   return v_mayor;
+
+end;
+
+select F_mayor_menor(5,5) as mayor from dual;
+
+
+-- ralizar una función para devolver el mayor de tres números
+-- no utilizar if
+-- buscar función de oracle que nos devuelva el mayor
+
+create or replace function f_mayor_sinif
+(p1 number,p2 number,p3 number)
+return number
+
+as 
+   v_mayor number;
+begin
+   v_mayor := greatest(p1,p2,p3);
+   return v_mayor;
+end;
+
+
+select f_mayor_sinif(1,2,3) as mayor from dual;
+
+--- funciòn para calcular el iva
+-- se puede dejar predeterminada la función
+
+create or replace function f_iva
+(p_precio number, p_iva number :=1.18)
+return number
+
+as
+
+begin
+   return p_precio * p_iva;
+end;
+
+select f_iva(100, 1.21) as iva from dual;
+
+-- vistas
+-- Herramienta de la base de datos, es básica
+-- Ess una imagen de una tabla. No puede ser creada, solo por tabla o vista
+-- los datos siempre sadran de una tabla y nunca almacenara datos
+-- Se recupera de las tablas que se especìfica
+-- Se usa para trabajar consultas
+-- Un programadar simpre trabaja con vistas
+-- Las consoultas son lass más rapidas.
+-- CREAR UNA VISTA PARA TENER LOS DATOS DE LOS EMPLEADOS SIN EL SALARIVI LA HBAITAL
+
+create OR REPLACE VIEW AS F__EMPLEADOS_MP
+AS 
+   SELECT EMP_NO APELLLID, OFICIO, ESCHA_ALT, DEPT_NO FROM EMP;
+
+--UNA VISTA SIMPLIFICA LAS CONSUKLTAS-- MOSTRAR EL APLLIDO OFICIO, SALARIO
+
+CREATE OR REPLACE VIEW V_EMP_DEPT
+AS
+      SELECT EMP.APELLIDO, EMP.OFICIO, EMP.SALARIO, DEPT.DNOMBRE, DEPT.LOC
+      FROM EMP
+      INNER JOIN DEPT
+      ON EMP.DEPT_NO = DEPT.DEPT_NO
+
+      SELECT * FROM V_EMP_DEPT WHERE upper(LOC)= upper ('madrid');
+
+-- s puede hacer vistas con càlculos calculados y siempre debe tener alias
+create or replace view v_empleados_virtual
+as
+   select emp_no, apellido, oficio, salario + comision as total, dept_no from emp;
+
+-- modiificar el salario de los empleados analista
+
+update emp set salario = salario +1 where oficio = 'ANALISTA';
+update v_empleados_virtual set salario = salario +1 where oficio = 'ANALISTA';
+
+
+select * from v_empleados_virtual;
+
+-- ELIMINAMOS AL EMPLEADO CON ID 7917
+
+DELETE FROM v_empleados_virtual WHERE EMP_NO= 7917;
+
+INSERT INTO v_empleados_virtual VALUES (11111,'LUNES','LUNES',0,40);
+
+-- QUÉ SUCCEDE SI LAS COLUMNAS NO ADMITEN NULL
+
+UPDATE V_EMP_DEPT SET SALARIO = SALARIO +1 WHERE LOC = 'MADRID';
+
+DELETE FROM V_EMP_DEPT WHERE LOC = 'BARCELONA';
+
+-- SI LA CONSULTA MODIFICA DOS TABLAS, NO PERMITE
+-- UN TRRIGER AFECTA TABLAS Y VISTA/ SIRVE PARA CONDICIONAR EL DESARROLLO 
+
+ROLLBACK;
+
+-- VISTAS QUE PUEDEN SER INÙTILES
+
+CREATE OR REPLACE VIEW V_VENDEDORES
+AS
+   SELECT EMP_NO, APELLIDO, OFICIO, SALARIO, DEPT_NO FROM EMP
+   WHERE OFICIO = 'VENDEDOR'
+   WITH CHECK OPTION;
+
+
+UPDATE V_VENDEDORES SET SALARIO = SALARIO +1;
+
+UPDATE V_VENDEDORES SET OFICIO = 'VENDIDOS';
+
+SELECT * FROM V_VENDEDORES;
+
+
+
+--- debemos pedir un nùmero narcisita
+--- la función es Power
+
+create or replace function f_narcista
+(n1 varchar2(50))
+return boolean
+
+as
+   potencia number:= len(n1);
+   resultado number:= 0
+   inicial number := to_number(n1)
+   v_resultado := 
+   
+begin
+
+   for i in 1..potencia loop
+      resultado := resultado + power( to_number(substr(n1,i,1)), potencia)
+   end loop;
+   
+   if resultado = inicial then
+      v_resultado := false
+   else
+      v_resultado := true
+   end if;
+   
 end;
 

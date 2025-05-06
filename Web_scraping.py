@@ -20,7 +20,7 @@ chrome_options.add_experimental_option('useAutomationExtension', False)
 driver = webdriver.Chrome(options=chrome_options)
 
 # Leer archivo
-SNIES_filtrado = pd.read_excel('primeros_links.xlsx')
+SNIES_filtrado = pd.read_excel('Busqueda.xlsx')
 links = pd.DataFrame()
 links['búsqueda'] = SNIES_filtrado['búsqueda']
 

@@ -2439,3 +2439,24 @@ end;
 
 
 insert into dept values(66,'milan', 'barcelona');
+
+
+drop  trigger tr_depet_control_barcelona;
+
+create or replace trigger tr_depet_control_localidades
+before insert
+on dept
+for each row
+declare
+   v_num number;
+begin
+   dbms_output.put_line('trigger control localidades');
+   select count(dept_no) into v_num from dept where upper(loc)= upper(:new.loc);
+   if (v_num > 0 ) then
+   raise_application_error(-20001, 'Solo un departamento por ciudad');
+   end if;
+end;
+
+insert into dept values(66,'milan', 'teruel');
+
+insert into dept values(1111,'milan', 'teruel');

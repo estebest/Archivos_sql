@@ -2070,10 +2070,6 @@ select f_iva(100, 1.21) as iva from dual;
 -- Las consoultas son lass más rapidas.
 -- CREAR UNA VISTA PARA TENER LOS DATOS DE LOS EMPLEADOS SIN EL SALARIVI LA HBAITAL
 
-create OR REPLACE VIEW AS F__EMPLEADOS_MP
-AS 
-   SELECT EMP_NO APELLLID, OFICIO, ESCHA_ALT, DEPT_NO FROM EMP;
-
 --UNA VISTA SIMPLIFICA LAS CONSUKLTAS-- MOSTRAR EL APLLIDO OFICIO, SALARIO
 
 CREATE OR REPLACE VIEW V_EMP_DEPT
@@ -2135,6 +2131,7 @@ SELECT * FROM V_VENDEDORES;
 --- debemos pedir un nùmero narcisita
 --- la función es Power
 
+/*
 create or replace function f_narcista
 (n1 varchar2(50))
 return boolean
@@ -2158,4 +2155,287 @@ begin
    end if;
    
 end;
+*/
 
+-- procedimiento para modificar el salario de los doctores de forma individual
+-- 1) bloque pl/ql
+-- no e puede modificar la tabla y a la ve hacer un select sobre ella
+
+select * from doctor;
+
+create or replace package pk_doctores
+as
+    procedure incremento_random_doctores;
+    function function_random_doctores(p_iddoctor DOCTOR.DOCTOR_NO%TYPE)
+    return NUMBER;
+end pk_doctores;
+--body
+create or replace package body pk_doctores
+as
+    procedure incremento_random_doctores
+    as
+        cursor c_doctores is
+        select DOCTOR_NO, APELLIDO, SALARIO from DOCTOR;
+        v_random number;
+    begin
+        for v_doc in c_doctores
+        loop
+            v_random := function_random_doctores(v_doc.DOCTOR_NO);
+            update DOCTOR set SALARIO = SALARIO + v_random
+            where DOCTOR_NO=v_doc.DOCTOR_NO;
+            dbms_output.put_line('Doctor ' || v_doc.APELLIDO 
+            || ' tiene un incremento de ' || v_random);
+        end loop;
+    end;
+    function function_random_doctores(p_iddoctor DOCTOR.DOCTOR_NO%TYPE)
+    return NUMBER
+    as
+        v_salario DOCTOR.SALARIO%TYPE;  
+        v_random NUMBER;
+    begin
+        select SALARIO into v_salario from DOCTOR
+        where DOCTOR_NO=p_iddoctor;
+        if (v_salario < 200000) then
+            v_random := trunc(dbms_random.value(1,500));
+        elsif (v_salario > 300000) then
+            v_random := trunc(dbms_random.value(1, 50));
+        else 
+            v_random := trunc(dbms_random.value(1, 300));
+        end if;
+        return v_random;    
+    end;
+end pk_doctores;
+
+
+---- insumos para crear el paquete
+create or replace function random_doctor
+(p_iddoctor doctor.doctor_no%type)
+return number
+as
+   v_salario doctor.salario%type;
+   v_random number;
+
+begin
+   select salario into v_salario from doctor where doctor_no = p_iddoctor;
+   if (v_salario < 200000 ) then
+      v_random:= trunc(dbms_random.value (1,500));
+
+   elsif (v_salario > 300000 ) then
+      v_random:= trunc(dbms_random.value (1,50));
+   else
+      v_random:= trunc(dbms_random.value (1,300));
+   end if;
+   return v_random;
+end;
+--386 - 500
+--522 - 50
+
+select random_doctor(386) as incremento from dual;
+
+select random_doctor(522) as incremento from dual;
+
+
+declare
+   cursor c_doctores is
+   select doctor_no, apellido, salario from doctor;
+   v_random number;
+
+begin
+   
+   for v_doc in c_doctores
+   loop
+      v_random:= random_doctor(v_doc.Doctor_no);
+      dbms_output.put_line('Doctor ' || v_doc.Apellido || ' tiene un incrmento de: ' || v_random);
+      update doctor set salario = salario + v_random;
+
+   end loop;
+
+end;
+
+
+
+-- registros
+-- un registro es una variable, al igual que un int/varchar2. sirve para guardar tipo de datos generados por el usuario
+-- es lo mismo que un rowtype. se dfine con los campo y las variables que yo decida.
+-- se declara de forma explìcita con el tipo de nombre, una cosa es la declaraciòn y otra el valor.
+-- Cuando se declara, se hace primro la estructura y luego la variable que pertenece a dicha estructura. 
+-- es una herramienta para guardar datos
+-- la declaración de los sitios y su uso pueden estar en lugares diferente
+-- se usan para compartir variables entre varios procedimientos
+
+-- bloque para recuperar el apellido, oficio y salario de empleados
+-- un record e un rowtypee peronalizado
+declare
+-- primero se declara el tipo
+   type type_empleado is record(v_apellido varchar2(20), v_oficio varchar2(20), v_salario number(20));
+   -- uso del tipo en una variable
+   v_tipo_empleado type_empleado;
+
+begin
+   select apellido, oficio, salario into v_tipo_empleado from emp where emp_no= 7839;
+   dbms_output.put_line('Apellido: '|| v_tipo_empleado.v_apellido || ' oficio: '|| v_tipo_empleado.v_oficio);
+end;
+
+-- arrays
+-- guarda en sì mùltiples variables
+-- es muy parecida a listas y lo recuera todo por su poiciòn ¡
+-- cuando ponemo 'type' son dclaraciones
+
+-- por un lado tenemos la declaraciòn del tipo
+-- por otro lado tenemos la varabl de dicho tipo
+
+declare 
+--   array para numeros
+   type table_numeros is table of number index by binary_integer;
+   --objto para almacenar varios nùmeros
+   lista_numeros table_numeros;
+begin
+   lista_numeros(1) :=88;
+   lista_numeros(2) :=99;
+   lista_numeros(3) :=222;
+   DBMS_OUTPUT.PUT_LINE('numero elementos' || lista_numeros.count);
+
+   for i in 1.. lista_numeros.count loop
+      DBMS_OUTPUT.PUT_LINE('numero: ' || lista_numeros(i));
+   end loop;
+
+end;
+
+-- se pueden almacenar tipos màs complejos
+
+declare
+   TYPE table_dept is table of dept%rowtype index by binary_integer;
+   -- declaramos el objeto para almacenar filas
+   lista_dept table_dept;
+
+begin
+   select * into lista_dept(1) from dept where dept_no=10;
+   select * into lista_dept(2) from dept where dept_no=30;
+   for i in 1..lista_dept.count
+   loop
+      dbms_output.put_line(LISTA_DEPT(i).dnombre||', '|| lista_dept(i).loc);
+   end loop;
+end;
+
+--Varray todos los elementos tienen que ser exactos y es muy parecido a is table off, pero es diferente porque necesita decir cuàntos
+-- limit determina el nùmero màximo de elementos
+-- extend añade lementos al array (de forma individual)
+-- un objeto tipo v_array se crea el objeto con los parentesìs y se debe inicializar
+
+declare
+   cursor cursorempleados is
+   select apellido from emp;
+   type c_lista is varray (20) of emp.apellido%type;
+   lista_empleados c_lista := c_lista();
+   contador integer := 0;
+begin
+   for n in cursorempleados loop
+      contador := contador +1;
+      lista_empleados.extend;
+      lista_empleados(contador) := n.apellido;
+      dbms_output.put_line('empleado '|| contador || ' : ' || lista_empleados (contador) );
+   end loop;
+end;
+
+-- triggers
+-- mantiene la integridad de las tablas
+-- son limitaciones de la tabla de alto nivel
+-- se ejecuta cuando hago consultas de acciòn (update/insert/delete)
+-- sirven para bloquear acciones
+-- before: sobr las tablas
+-- after: sobre la tablas
+-- instead of : en lugar de... sobre las vistas
+
+--insert
+
+create or replace trigger tr_depet_before_insert
+before insert
+on dept
+for each row
+declare
+begin
+   dbms_output.put_line('trigger dept before insert row');
+   dbms_output.put_line(:new.dept_no|| ' , '||:new.dnombre|| ' , '||:new.loc);
+end;
+
+insert into dept values (111,'nuevo','toledo');
+
+--delete
+
+create or replace trigger tr_depet_before_insert
+before delete
+on dept
+for each row
+declare
+begin
+   dbms_output.put_line('trigger dept before insert row');
+   dbms_output.put_line(:old.dept_no|| ' , '||:old.dnombre|| ' , '||:old.loc);
+end;
+
+select * from dept;
+
+delete from dept where dept_no=41;
+
+--update
+
+create or replace trigger tr_depet_before_insert
+before update
+on dept
+for each row
+declare
+begin
+   dbms_output.put_line('trigger dept before insert row');
+   dbms_output.put_line(:old.dept_no|| ' , '||:old.dnombre|| ' , '||:old.loc|| ' nueva loc: '|| :new.loc);
+end;
+
+update dept set loc= 'victoria' where dept_no=111; 
+
+-- trigr control doctor
+
+create or replace trigger tr_doctor_control_salario_update
+before update
+on doctor
+for each row
+   when (new.salario > 250000)
+declare
+begin
+   dbms_output.put_line('trigger doctor before update row');
+   dbms_output.put_line('Dr/Dra '|| :old.apellido || ' cobra mucho dinero: '|| :new.salario||'. Antes: '|| :old.salario);
+end;
+
+update doctor set salario = 350000 where doctor_no = 386;
+
+-- la ùnica forma para bloquear a travès de excepciones
+-- no e pueden tener dos triggers del mismo tipo en una tabla
+
+drop trigger tr_depet_before_insert;
+
+create or replace trigger tr_depet_control_barcelona
+before insert
+on dept
+for each row
+declare
+begin
+   dbms_output.put_line('trigger control barcelona row');
+   if (upper(:new.loc)= 'BARCELONA') THEN
+      dbms_output.put_line(:new.dept_no|| ' , '||:new.dnombre|| ' , '||:new.loc);
+      raise_application_error(-20001, 'Error Barcelona');
+   END IF;
+end;
+
+create or replace trigger tr_depet_control_barcelona
+before insert
+on dept
+for each row
+   when (upper(new.loc)= 'BARCELONA')
+declare
+begin
+   dbms_output.put_line('trigger control barcelona row');
+   dbms_output.put_line(:new.dept_no|| ' , '||:new.dnombre|| ' , '||:new.loc);
+   raise_application_error(-20001, 'Error Barcelona');
+   
+end;
+
+
+
+insert into dept values(66,'milan', 'barcelona');

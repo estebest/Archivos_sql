@@ -73,6 +73,8 @@ for i, termino in enumerate(links['búsqueda']):
         print("Continuando después de la pausa larga.")
 
 driver.quit()
+
+
 primeros_links.to_excel("links_resultado.xlsx", index=False)
 
 

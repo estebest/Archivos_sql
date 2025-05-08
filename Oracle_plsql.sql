@@ -2443,6 +2443,8 @@ insert into dept values(66,'milan', 'barcelona');
 
 drop  trigger tr_depet_control_barcelona;
 
+drop trigger tr_depet_control_localidades;
+
 create or replace trigger tr_depet_control_localidades
 before insert
 on dept
@@ -2459,4 +2461,213 @@ end;
 
 insert into dept values(66,'milan', 'teruel');
 
-insert into dept values(1111,'milan', 'teruel');
+drop trigger tr_doctor_control_salario_update;
+
+rollback;
+--con el after, dice que la tala está mutando. Sobre estos triggers no se puede acceder a la tabla, solo a las variables:new y :old u otras tablas que estoy trabajando
+-- si hago consultas sobre la tabla tiene que ser con el trigger before
+
+
+-- los triggers se usan tambièn para definir integridad relacional
+-- podemos aplicar un update para que modifique toda las veces que aparece dicho dato
+
+-- si cambio un id de departamento, que se modifiquen los empleados asociados
+
+drop trigger tr_update_dept_cascade;
+
+create or replace trigger tr_update_dept_cascade
+before update
+on dept
+for each row
+   when (new.dept_no <> old.dept_no)
+declare
+
+begin
+   dbms_output.put_line('dept_no cambiado en dept');
+   -- modificamos los datos asociados
+   update emp set dept_no =:new.dept_no where
+   dept_no=: old.dept_no;
+
+end;
+
+update dept set dept_no = 30 where dept_no=31;
+
+select * from emp;
+
+--- impedir un nuevo presidente si ya existe uno en emp
+
+drop  trigger tr_no_dos_presidentes;
+
+create or replace trigger tr_no_dos_presidentes
+before insert
+on emp
+for each row
+   when(upper(new.oficio) = 'PRESIDENTE')
+declare
+   v_oficio number;
+begin
+   dbms_output.put_line('control presidentes');
+   select count(emp_no) into v_oficio from emp where upper(oficio) = 'PRESIDENTE';
+
+   if (v_oficio <> 0) then
+      dbms_output.put_line('trigger control presidenes');
+      raise_application_error(-20001, 'Solo un presidente');
+      end if;
+end; 
+
+select * from emp;
+
+insert into emp values(66,'milan', 'PRESIDENTA',null,sysdate, 1,1,10);
+
+rollback;
+
+--
+-- no quiero que exista màs de una localidad si hacemos update
+-- con updae o delete no puedo hacer un select sobre la tala
+create or replace trigger tr_depet_control_localidades
+before update
+on dept
+for each row
+declare
+   v_num number;
+begin
+   dbms_output.put_line('trigger control localidades');
+   select count(dept_no) into v_num from dept where upper(loc)= upper(:new.loc);
+   if (v_num > 0 ) then
+   raise_application_error(-20001, 'Solo un departamento por ciudad');
+   end if;
+end;
+
+select * from dept;
+
+update dept set loc= 'Cadiz' where loc='SEVILLA';
+
+insert into dept values(66,'milan', 'teruel');
+
+--- lo primro es guardar un package para almacenar la variables en un trigger
+
+create or replace package pk_triggers
+as
+   v_nueva_localidad dept.DEPT_NO%TYPE;
+end pk_triggers;
+
+   -- después es necesario crear uno del before para capturar la variable new
+create or replace trigger tr_depet_control_localidades_row
+before update
+on dept
+for each row
+declare
+begin
+   -- almacenar el valor de la nueva localidad
+   PK_TRIGGERS.V_NUEVA_LOCALIDAD := :NEW.LOC;
+END;
+
+   -- y ahora se aprovecha esa variable desde 
+create or replace trigger tr_dept_control_loc_after
+after update
+on dept
+declare
+   V_NUMERO NUMBER;
+begin
+   SELECT COUNT(DEPT_NO) INTO v_numero from dept
+   where upper(loc) = upper(pk_triggers.v_nueva_localidad);
+   if (v_numero > 0) then
+      raise_application_error(-20001, 'solo un departamento por localidad');
+   end if;
+   dbms_output.Put_line('localidad nueva: '|| pk_triggers.v_nueva_localidad);
+end; 
+
+update dept set loc= 'CADIZ' WHERE dept_no=10;
+
+select * from dept;
+
+rollback;
+
+
+---- trigger insted of----
+---- no hace la acciòn, se ejcuta y actùa sobre vistas
+---- cuando se inserta en una vista, permite solucionar problemas en las cosnultas de acción e impide realizar cambios sobre la tabla
+
+create or replace view vista_departamento
+as
+   select * from dept;
+
+select * from vista_departamento;
+
+insert into vista_departamento values
+(11,'visa','con trigger');
+select * from vista_departamento;
+
+---creamos un trigger sobre la vista
+
+create or replace trigger tr_vista_dept
+instead of insert
+on vista_departamento
+declare
+begin
+   dbms_output.Put_line('inertando vista en dept');
+end;
+
+select * from vista_departamento;
+
+
+
+
+----- crear una vista con los datos de los empleados sin sus datos sensibles (salario, comisiòn, fecha alta)
+
+create or replace view vista_empleados
+as
+   select emp_no, apellido, oficio, dir, dept_no from emp;
+
+select * from vista_empleados;
+
+insert into vista_empleados values (666, 'el nuevo', 'becarios', 7566, 10);
+
+select * from emp;
+
+--- creamos un trigger rellenando los huecos que quedan 
+create or replace trigger tr_vista_empleados
+instead of insert
+on vista_empleados
+declare
+begin
+   -- con new capturamos los datos de la vista y rellenamos el resto
+   insert into emp values 
+   (:new.emp_no, :new.apellido, :new.oficio, :new.dir, sysdate, 0, 0, :new.dept_no);
+end;
+
+rollback;
+
+select * from doctor; 
+
+create or replace view vista_doctores
+as
+   select doctor.doctor_no, doctor.apellido, doctor.especialidad, doctor.salario, hospital.nombre
+   from doctor
+   inner join hospital
+on doctor.hospital_cod = hospital.hospital_cod;
+
+select * from vista_doctores;
+
+select * from doctor;
+
+select * from hospital;
+
+insert into vista_doctores values
+(111, 'house', 'especialista', 450000, 'santa');
+
+
+create or replace trigger tr_vista_doctores
+instead of insert
+on vista_doctores
+declare
+   v_hospital_cod hospital.HOSPITAL_COD%TYPE;
+begin
+   select hospital_cod into v_hospital_cod from hospital where upper(hospital.nombre) = upper(:new.nombre);
+   insert into doctor values 
+   (v_hospital_cod,:new.doctor_no,:new.apellido,:new.especialidad,:new.salario );
+end;
+
+--- sql dinámico
+-- consultas dentro de un texto
+-- con un comando le digo que ejecute
